@@ -3,7 +3,7 @@
 #+author: Maximilian Küffner
 
 * Prerequisites
-- Python3.# and pyvis ~pip install pyvisa~
+- Python3.# and pyvisa ~pip install pyvisa~
 - NIVisa
 
 * Hints 
@@ -11,4 +11,4 @@
 - the path to the NIVisa backend can be set in a file called ~.pyvisarc~ (see [[https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html][backend configuration]])
 
 * Documentation
-[[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
+- [[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
