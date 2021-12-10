@@ -1,0 +1,14 @@
+#+title: Minimal FMR python-implementation
+#+subtitle: with basic device support
+#+author: Maximilian Küffner
+
+* Prerequisites
+- Python3.# and pyvis ~pip install pyvisa~
+- NIVisa
+
+* Hints 
+- make sure that ~pyvisa~ is aware of the NIVisa backend. If not, specify the path to the ~visa64.dll~ for the resource manager
+- the path to the NIVisa backend can be set in a file called ~.pyvisarc~ (see [[https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html][backend configuration]])
+
+* Documentation
+[[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
