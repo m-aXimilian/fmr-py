@@ -1,6 +1,8 @@
+from nidaqmx.task import Task
 import pyvisa as vi
+import numpy as np
 import logging
-import nidaqmx
+import nidaqmx as daq
 
 class HP83508:
     """Wrapper for HP83508 RF-source functions"""
@@ -27,7 +29,26 @@ class HP83508:
         logging.info('Set P to {}dBm'.format(_p))
         self.id.write("pl {} DM".format(round(_p,1)))
 
+
+
 class NIUSB6259:
-    def __init__(self, _rm, _id='') -> None:
+    def __init__(self) -> None:
         pass
+
+    def ai_volt(self, _dev, _ch, _s) -> np.array:
+        logging.info('Opening {} analog input voltage channels'.format(len(_ch)))
+
+        with daq.Task() as task:
+            for c in _ch.values():
+                task.ai_channels.add_ai_voltage_chan(
+                    '{dev}/{ch}'.format(
+                        dev = _dev,
+                        ch = c)
+                )
+            dat = task.read(number_of_samples_per_channel=_s)
+        logging.debug('generated {} numpy array'.format(np.array(dat).shape))
+        
+        self.last_ai_read = np.array(dat)
+
+        return self.last_ai_read
 

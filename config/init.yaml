@@ -3,12 +3,13 @@ devices:
     id: "GPIB0::19::INSTR"
   daq-card:
     id: "Dev1"
-    channels:
+    ai:
       field-set-measure: "ai1"
       field-is-measure: "ai2"
       x-value-lockin: "ai0"
       y-value-lockin: "ai4"
       short-circtuit: "ai3"
+    ao:
       set-value-small: "ao0"
 
 measurement:
@@ -19,3 +20,4 @@ measurement:
     f-start: 2
     f-end: 5
     f-step: 0.5
+    p-dbm: 0
