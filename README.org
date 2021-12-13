@@ -5,11 +5,11 @@
 * Prerequisites
 - Python3.# and pyvisa (~pip install pyvisa~)
 +- NI-DAQmx Python API (~pip install nidaqmx~)+
-- NI-DAQmx Pyhton API (~python -m pip install git+https://github.com/ni/nidaqmx-python.git~)[fn:1]
+- NI-DAQmx Pyhton API (~python -m pip install git+https://github.com/ni/nidaqmx-python.git~)[^fn:1]
 - NIVisa
 - pyyaml (~pip install pyyaml~)
 
-[fn:1] ~Sequence~ moved from ~collections~ to ~collections.abc~ in Python 3.10 which yiedls include errors when using pip [[https://github.com/ni/nidaqmx-python/issues/129][nidaqmx issue 129]]
+[^fn:1]: ~Sequence~ moved from ~collections~ to ~collections.abc~ in Python 3.10 which yiedls include errors when using pip [[https://github.com/ni/nidaqmx-python/issues/129][nidaqmx issue 129]]
 
 * Hints 
 - make sure that ~pyvisa~ is aware of the NIVisa backend. If not, specify the path to the ~visa64.dll~ for the resource manager
