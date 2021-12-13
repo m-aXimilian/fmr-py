@@ -4,8 +4,8 @@
 
 * Prerequisites
 - Python3.# and pyvisa (~pip install pyvisa~)
-_- NI-DAQmx Python API (~pip install nidaqmx~)_
-- NI-DAQmx Pyhton API (~python -m pip install git+https://github.com/ni/nidaqmx-python.git~) [fn:1]
++- NI-DAQmx Python API (~pip install nidaqmx~)+
+- NI-DAQmx Pyhton API (~python -m pip install git+https://github.com/ni/nidaqmx-python.git~)[fn:1]
 - NIVisa
 - pyyaml (~pip install pyyaml~)
 
@@ -18,3 +18,4 @@ _- NI-DAQmx Python API (~pip install nidaqmx~)_
 * Documentation
 - [[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
 - [[https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=de-DE][NI-DAQmx man]]
+- [[https://github.com/ni/nidaqmx-python][nidaqmx python repo]]
