@@ -1,0 +1,21 @@
+devices:
+  rf-generator:
+    id: "GPIB0::19::INSTR"
+  daq-card:
+    id: "Dev1"
+    channels:
+      field-set-measure: "ai1"
+      field-is-measure: "ai2"
+      x-value-lockin: "ai0"
+      y-value-lockin: "ai4"
+      short-circtuit: "ai3"
+      set-value-small: "ao0"
+
+measurement:
+  h-field:
+    h-min: 0
+    h-max: 150
+  rf: 
+    f-start: 2
+    f-end: 5
+    f-step: 0.5

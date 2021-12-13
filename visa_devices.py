@@ -1,4 +1,5 @@
 import pyvisa as vi
+import nidaqmx
 
 class HP83508:
     """Wrapper for HP83508 RF-source functions"""
@@ -24,5 +25,5 @@ class HP83508:
 
 class NIUSB6259:
     def __init__(self, _rm, _id='') -> None:
-        pass       
+        pass
 
