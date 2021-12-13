@@ -15,12 +15,7 @@ def main():
     #rf = devs.HP83508(rm, config['devices']['rf-generator']['id'])
     daq_card = devs.NIUSB6259()
     
-    test = daq_card.ai_volt(
-        config['devices']['daq-card']['id'],
-        config['devices']['daq-card']['ai'],
-        5)
- 
-       
+      
 def load_config(file_path):
     with open(file_path,"r") as f:
         try:
