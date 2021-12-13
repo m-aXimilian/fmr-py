@@ -11,10 +11,8 @@ def main():
     logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.INFO)
     logging.info('Started in main()')
     rm = vi.ResourceManager()
-    print(config)
     rf = devs.HP83508(rm, config['devices']['rf-generator']['id'])
-    #rf.setF(3)
-
+    
 def load_config(file_path):
     with open(file_path,"r") as f:
         try:
