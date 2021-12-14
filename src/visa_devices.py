@@ -16,7 +16,7 @@ class HP83508:
         self.id = _rm.open_resource(_id)
     
 
-    
+
     def setF(self, _f) -> None:
         """Takes a desired set-frequency _F (GHz) and sends it to the device."""
         if _f < 2 or _f > 26:
@@ -37,45 +37,70 @@ class HP83508:
 
 class NIUSB6259:
     def __init__(self) -> None:
-        pass
+        self.task = daq.Task()
 
 
+    def __del__(self) -> None:
+        self.task.close()
+    
 
-    def ai_volt_mult(self, _dev, _ch, _s) -> np.array:
+    def __restart(self) -> None:
+        self.task.close()
+        self.task = Task()
+
+
+    def __format_channel(self, _dev, _ch) -> str:
+        return '{dev}/{ch}'.format(dev = _dev, ch = _ch)
+
+    
+
+
+    def ai_volt_mult(self, _dev, _ch, _s, _r) -> np.array:
         """Read _S samples of analog voltage for each of the channels passed in the 
-        _CH dir on device _DEV."""
+        _CH dir on device _DEV at rate _R (Hz)."""
         if isinstance(_ch, str):
             logging.debug('A dictionary of channels must be passed to function {}'.
                 format(self.ai_volt_mult.__name__))
             return
-        
-        with daq.Task() as task:
-            for c in _ch.values():
-                task.ai_channels.add_ai_voltage_chan(
-                    '{dev}/{ch}'.format(
-                        dev = _dev,
-                        ch = c)
-                )
-            dat = task.read(number_of_samples_per_channel=_s)
-        logging.debug('generated {} numpy array'.format(np.array(dat).shape))
+
+        for c in _ch.values():
+            tmp_c = self.__format_channel(_dev, c)
+
+            if (tmp_c in self.task.channel_names): return
+
+            self.task.ai_channels.add_ai_voltage_chan(tmp_c)
+
+        self.task.timing.cfg_samp_clk_timing(_r)
+        dat = self.task.read(number_of_samples_per_channel=_s)
         self.last_ai_read = np.array(dat)
+        
+        logging.debug('generated {} numpy array'.format(self.last_ai_read.shape))
         
         return self.last_ai_read
 
 
-
-    def ai_volt_single(self, _dev, _ch, _s) -> np.array:
-        """Read _S samples of analog voltage for the channel passed in _CH on device _DEV."""
+    def ai_volt_single(self, _dev, _ch, _s, _r) -> np.array:
+        """Read _S samples of analog voltage for the channel passed in _CH on device _DEV
+        at rate _R (Hz)."""
         if not isinstance(_ch, str):
             logging.debug('A string must be passed to the channel in function {}'
                 .format(self.ai_volt_single.__name__))
             return
         
-        with daq.Task() as task:
-            task.ai_channels.add_ai_voltage_chan(
-                '{dev}/{ch}'.format(dev = _dev, ch = _ch)
-            )
-            dat = task.read(number_of_samples_per_channel=_s)
+        tmp_c = self.__format_channel(_dev, _ch)
+
+        if not (tmp_c in self.task.channel_names):
+            self.task.ai_channels.add_ai_voltage_chan(tmp_c)
+
+        self.task.timing.cfg_samp_clk_timing(_r)
+        dat = self.task.read(number_of_samples_per_channel=_s)
         self.last_ai_read = np.array(dat)
 
+        logging.debug('generated {} numpy array'.format(self.last_ai_read.shape))
+
         return self.last_ai_read
+
+
+    def ao_write_single(self, _dev, _ch, _s) -> int:
+        pass
+
