@@ -11,6 +11,7 @@ devices:
       short-circtuit: "ai3"
     ao:
       set-value-small: "ao0"
+      set-value-big: "ao1"
 
 measurement:
   h-field:

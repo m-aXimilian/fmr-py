@@ -23,10 +23,6 @@
 * Measurement 
 
 ** DAQmx read and write values
-In order to sync properly, ever object of the /NIUSB6259/ class shares a /nidaqmx.task.Task()/.
-If a new measurement is to be created with a different set of channels, existing objects 
-of the /NIUSB6259/ classes must be destroyed (~del <my_NIUSB6259_object~) and a new one 
-must be created in order to have a blank /nidaqmx.task.Task()/ as well.
 
 
 * ToDo

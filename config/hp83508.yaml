@@ -1,0 +1,5 @@
+boundaries:
+  f-min: 2
+  f-max: 26
+  p-min: -10
+  p-max: 10
