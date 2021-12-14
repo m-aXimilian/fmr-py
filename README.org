@@ -14,6 +14,7 @@
 * Hints 
 - make sure that ~pyvisa~ is aware of the NIVisa backend. If not, specify the path to the ~visa64.dll~ for the resource manager
 - the path to the NIVisa backend can be set in a file called ~.pyvisarc~ (see [[https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html][backend configuration]])
+- see an example for reading and writing with an additional clock task at [[https://github.com/ni/nidaqmx-python/blob/master/nidaqmx/tests/test_read_write.py][nidaqmx tests]]
 
 * Documentation
 - [[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
@@ -26,4 +27,5 @@
 
 
 * ToDo
-- [ ] config-files for devices
+- [x] config-files for devices
+- [ ] implement Measurement with a clock task

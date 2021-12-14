@@ -19,12 +19,13 @@ def main():
         writer.ao_channels.add_ao_voltage_chan('Dev1/'+ config['devices']['daq-card']['ao']['set-value-small'])
         reader.ai_channels.add_ai_voltage_chan('Dev1/'+ config['devices']['daq-card']['ai']['field-set-measure'])
         setH = list(range(0,100))
-        setH = [(lambda n: n/100)(e) for e in setH]
+        setH = np.array([(lambda n: n/100)(e) for e in setH])
+        rate=100000
 
         read = []
         for v in setH:
             writer.write(v)
-            time.sleep(0.0001)
+            time.sleep(1/rate)
             read.append(reader.read())
         
         np.savetxt('./measurement/test2.csv', np.array(read), delimiter=',',

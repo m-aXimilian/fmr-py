@@ -12,6 +12,10 @@ devices:
     ao:
       set-value-small: "ao0"
       set-value-big: "ao1"
+    ctr:
+      impuls-1: "ctr0"
+    trigger:
+      impuls-1: "Ctr0InternalOutput"
 
 measurement:
   h-field:
