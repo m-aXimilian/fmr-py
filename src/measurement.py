@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import yaml
+from time import sleep, strftime
 
 import os, sys
 
@@ -18,5 +19,19 @@ class FMRMeasure:
             logging.info('loaded config file from {}'.format(_path))
         except yaml.YAMLError as e:
             logging.error('failed to load config from {}. Error: {}'.format(_path, e))
+        
+        self.f_name = '{name}_{timestamp}'.format(name=self.cfg['name'], timestamp=strftime("%Y-%m-%d_%H-%M-%S"))
+
+    def setup_rf():
+        pass
+
+    def setup_daq_inputs(self, _ch):
+        pass
+
+    def setup_daq_outpus(self, _ch):
+        pass
+
+    def setup_daq_clk(self):
+        pass
 
 

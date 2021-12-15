@@ -17,6 +17,9 @@ class FMRMeasureTest(unittest.TestCase):
         meas = m.FMRMeasure('./config/fmr_1.yaml')
         self.assertIsNotNone(meas.cfg)
 
+    def test_filename(self):
+        meas = m.FMRMeasure('./config/fmr_1.yaml')
+        self.assertIsNotNone(meas.f_name)
 
 
 if __name__ == '__main__':
