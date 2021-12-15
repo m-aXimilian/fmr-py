@@ -14,6 +14,7 @@ def main():
     logging.info('Started in main()')
     rm = vi.ResourceManager()
     rf = devs.HP83508(rm,'./config/hp83508.yaml')
+    rf.setF(4)
 
     """
     with daq.Task() as reader, daq.Task() as writer:

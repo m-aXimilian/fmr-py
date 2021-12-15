@@ -136,6 +136,6 @@ class NIUSB6259:
         return np.array(tmp)
 
 
-    def analog_wirte(self, _arr) -> None:
+    def analog_write(self, _arr) -> None:
         print('writing {}'.format(_arr))
         self.task.write(_arr)

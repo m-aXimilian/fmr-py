@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-res = np.loadtxt('./measurement/test_2021-12-15_11-54-46.csv', skiprows=1, delimiter=',')
+res = np.loadtxt('./measurement/test-3GHz_2021-12-15_17-39-00.csv', skiprows=3, delimiter=',')
 print(res.shape)
 
 plt.plot(res)
