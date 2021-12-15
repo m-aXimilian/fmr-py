@@ -1,3 +1,4 @@
+id: "GPIB0::19::INSTR"
 boundaries:
   f-min: 2
   f-max: 26

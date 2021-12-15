@@ -12,9 +12,10 @@ def main():
     config = load_config('./config/init.yaml')
     logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
     logging.info('Started in main()')
-    #rm = vi.ResourceManager()
-    #rf = devs.HP83508(rm, config['devices']['rf-generator']['id'])
+    rm = vi.ResourceManager()
+    rf = devs.HP83508(rm,'./config/hp83508.yaml')
 
+    """
     with daq.Task() as reader, daq.Task() as writer:
         writer.ao_channels.add_ao_voltage_chan('Dev1/'+ config['devices']['daq-card']['ao']['set-value-small'])
         reader.ai_channels.add_ai_voltage_chan('Dev1/'+ config['devices']['daq-card']['ai']['field-set-measure'])
@@ -35,7 +36,7 @@ def main():
 
 
 
-    """
+
     daq_card1 = devs.NIUSB6259()
     daq_card2 = devs.NIUSB6259()
     

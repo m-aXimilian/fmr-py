@@ -9,16 +9,17 @@ import yaml
 
 class HP83508:
     """Wrapper for HP83508 RF-source functions"""
-    def __init__(self, _rm, _id='') -> None:
+    def __init__(self, _rm, _path) -> None:
         """Open a resource from the _ID string and the resource manager 
         _RM and save the resource object to ID."""
-        if _id == '': 
-            return
-        logging.info('RF-Generator with ID {} generated'.format(_id))
-        self.id = _rm.open_resource(_id)
-        with open('./config/hp83508.yaml','r') as f:
+        
+        with open(_path,'r') as f:
             try:
-                self.boundaries = yaml.safe_load(f)['boundaries']
+                tmp = yaml.safe_load(f)
+                self.boundaries = tmp['boundaries']
+                logging.info('RF-Generator boundaries set to {}'.format(self.boundaries))
+                self.id = tmp['id']
+                logging.info('RF-Generator with ID {} generated'.format(self.id))
             except yaml.YAMLError as e:
                 logging.debug('in HP83508 __init__ code: {}'.format(e))
     
