@@ -49,7 +49,32 @@ class FMRHandler:
 
 
 class FMRMeasurement:
+    """
+    Container for a single measuremnt process (channels, frequency etc. can NOT be reconfigured).
+    """
     def __init__(self, _params) -> None:
+        """
+        _PARAMS dictionary must contain the following
+            {
+            'rf-freq': 2,
+            'rf-p': 0,
+            'rf-rm': rm,    # vi resource manager
+            'rf-conf': './config/hp83508.yaml',
+            'H-set': np.linspace(0,100)/100,
+            'N': 10000,
+            'rate': 1000,
+            'name': 'test',
+            'daq-dev': 'Dev1',
+            'ai': ['ai0', 'ai1'],
+            'ao': ['ao0'],
+            'impuls': 'ctr0',
+            'trigger': 'Ctr0InternalOutput',
+            'mode': TaskMode.TASK_COMMIT,
+            'read-edge': Edge.FALLING,
+            'write-edge': Edge.RISING,
+            'read-timeout': 30,
+            } 
+        """
         self.params = _params
         self.f_name = './measurement/{n}-{f}GHz_{t}.csv'.format(
             n=self.params['name'],
@@ -58,12 +83,14 @@ class FMRMeasurement:
         self.daq_tasks = {}
 
     def setup_rf(self) -> None:
+        """Sets up the RF-source with the paramters from self.PARAMS (dict)"""
         self.rf = devs.HP83508(self.params['rf-rm'], self.params['rf-conf'])
         self.rf.setF(self.params['rf-freq'])
         self.rf.setP(self.params['rf-p'])
         
 
     def setup_daq_inputs(self) -> None:
+        """Sets up the DAQ input with the paramters from self.PARAMS (dict)"""
         self.daq_tasks.update(
             {'reader' : devs.NIUSB6259()}
         )
@@ -80,8 +107,8 @@ class FMRMeasurement:
         )
 
 
-
     def setup_daq_outputs(self) -> None:
+        """Sets up the DAQ output with the paramters from self.PARAMS (dict)"""
         self.daq_tasks.update(
             {'writer' : devs.NIUSB6259()}
         )
@@ -99,6 +126,7 @@ class FMRMeasurement:
 
 
     def setup_daq_clk(self) -> None:
+        """Sets up the DAQ clock and trigger with the paramters from self.PARAMS (dict)"""
         self.daq_tasks.update(
             {'clock' : devs.NIUSB6259()}
         )
@@ -115,7 +143,11 @@ class FMRMeasurement:
             self.params['daq-dev'],
             self.params['trigger'])
 
+
     def start_measurement(self) -> None:
+        """Start a measurement. Depends on :func:`~self.setup_daq_inputs`
+        :func:`~self.setup_daq_outputs` and :func:`~self.setup_daq_clk`.
+        I.e. will raise an error if those were not called before."""
         with open('./config/daq_limits.yaml', 'r') as f:
             limits = yaml.safe_load(f)
             if max(abs(self.params['H-set'])) > limits['max-v-output']:
@@ -134,8 +166,9 @@ class FMRMeasurement:
 
         self.write_results(out)
 
-    def write_results(self, _arr):
 
+    def write_results(self, _arr):
+        """Writes the array _ARR to the file path provided in """
         meta = 'H-field ramp:\t{hlow} to {hup}\n \
                 f:\t{f}\n \
                 samples:\t{n}'.format(

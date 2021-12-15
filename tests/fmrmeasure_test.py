@@ -44,21 +44,25 @@ class FMRMeasureTest(unittest.TestCase):
         self.assertIsNotNone(self.meas.f_name)
 
     def test_setup_rf(self):
-        # won't pass when RF-generator is not connected and running!
+        # won't pass if RF-generator is not connected and running!
         self.assertIsNone(self.meas.setup_rf())
 
     def test_setup_daq_inputs(self):
+        # won't pass if DAQ-card is not connected!
         self.meas.setup_daq_clk()
         self.assertIsNone(self.meas.setup_daq_inputs())
 
     def test_setup_daq_outputs(self):
+        # won't pass if DAQ-card is not connected!
         self.meas.setup_daq_clk()
         self.assertIsNone(self.meas.setup_daq_outputs())
 
     def test_setup_daq_clk(self):
+        # won't pass if DAQ-card is not connected!
         self.assertIsNone(self.meas.setup_daq_clk())
     
     def test_start_measurement(self):
+        # won't pass if DAQ-card is not connected!
         self.meas.setup_daq_clk()
         self.meas.setup_daq_inputs()
         self.meas.setup_daq_outputs()

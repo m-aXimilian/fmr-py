@@ -28,4 +28,5 @@
 
 * ToDo
 - [x] config-files for devices
-- [ ] implement Measurement with a clock task
+- [x] implement Measurement with a clock task
+- [ ] write the FMRHandler for FMRMeasurement class
