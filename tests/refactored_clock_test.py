@@ -44,6 +44,15 @@ def main():
     write.start()
     clock.start()
 
+    out = read.analog_read_n(N, timeout)
+
+    np.savetxt('./measurement/test_{}.csv'
+        .format(strftime("%Y-%m-%d_%H-%M-%S")), 
+        np.array(out), delimiter=',',
+        header='H-Field from {hmin} to {hmax} at {hf} and sampled \
+        with {hs}'.format(hmin=setH[0], hmax=setH[-1], hf=10, hs=100)
+    )
+
 def load_config(file_path):
     with open(file_path,"r") as f:
         try:

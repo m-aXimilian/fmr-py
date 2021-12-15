@@ -105,7 +105,7 @@ class NIUSB6259:
         
         self.task.co_channels.add_co_pulse_chan_freq(
             self.__format_channel(_dev, _ch),
-            _r)
+            freq=_r)
         
         self.task.timing.cfg_implicit_timing(samps_per_chan=_t)
         self.task.control(_m)
@@ -119,18 +119,19 @@ class NIUSB6259:
         """Configure the the trigger and clock for IO-channels of task self.task.
         With the sample rate _R, a trigger _TRIGG, the trigger edge _EDGE and a 
         number of samples _S."""
+        self.rate = _r
         self.task.timing.cfg_samp_clk_timing(_r, source=_trig, active_edge=_edge, samps_per_chan=_s)
 
 
-    def analog_read_n(self, _s) -> np.array:
-        """Read _S numbers of samples from the configured input channels and return
+    def analog_read_n(self, _s, _t) -> np.array:
+        """Read _S numbers of samples from the configured input channels with timeout _T and return
         them in an array."""
         if not self.task.channel_names:
             logging.debug('No channels added to read from. {}'.format(self.analog_read.__name__))
             return
         
         print('Read will take {}ms'.format(_s / self.rate * 1000))
-        tmp = self.task.read(number_of_samples_per_channel=_s)
+        tmp = self.task.read(number_of_samples_per_channel=_s, timeout=_t)
         return np.array(tmp)
 
 
