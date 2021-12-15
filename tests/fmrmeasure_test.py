@@ -11,14 +11,14 @@ class FMRMeasureTest(unittest.TestCase):
 
     #@unittest.skip()
     def test_init(self):
-        self.assertIsNotNone(m.FMRMeasure)
+        self.assertIsNotNone(m.FMRMeasurement)
     
     def test_config_right(self):
-        meas = m.FMRMeasure('./config/fmr_1.yaml')
+        meas = m.FMRMeasurement('./config/fmr_1.yaml')
         self.assertIsNotNone(meas.cfg)
 
     def test_filename(self):
-        meas = m.FMRMeasure('./config/fmr_1.yaml')
+        meas = m.FMRMeasurement('./config/fmr_1.yaml')
         self.assertIsNotNone(meas.f_name)
 
 

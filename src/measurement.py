@@ -11,7 +11,7 @@ sys.path.append(parentdir)
 import src.measurement as m
 
 
-class FMRMeasure:
+class FMRMeasurement:
     def __init__(self, _path) -> None:
         try:
             with open(_path, 'r') as f:
