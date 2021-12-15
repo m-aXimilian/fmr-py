@@ -1,3 +1,5 @@
+from re import L
+from nidaqmx.constants import TaskMode
 from nidaqmx.task import Task
 import pyvisa as vi
 import numpy as np
@@ -49,6 +51,9 @@ class NIUSB6259:
     def __del__(self) -> None:
         self.task.close()
     
+    def start(self) -> None:
+        self.task.start()
+
 
     def __format_channel(self, _dev, _ch) -> str:
         """Compose a string for passing to the nidaqmx-API functions from 
@@ -71,7 +76,7 @@ class NIUSB6259:
 
     def add_channels(self, _dev, _ch, _type='ai') -> None:
         """_CH can be of type dict, list or string. Contents are added as 
-        ai_voltage_channels to the device _DEV."""
+        voltage_channels of type _TYPE to the device _DEV."""
 
         add_fun = self.__get_add_channel(_type)
                                
@@ -93,16 +98,30 @@ class NIUSB6259:
             add_fun(tmp_c)
 
 
-    def config_clk(self, _r) -> None:
-        """Set the sample rate _R (Hz)."""
-        if not self.task.channel_names:
-            logging.debug('No channels added to set a clock for')
-            return
-        self.rate = _r
-        logging.debug('Sample rate set to {} Hz'.format(_r))
-        self.task.timing.cfg_samp_clk_timing(_r)
+    def config_clk(self, _dev, _ch, _r, _t=1000, _m=TaskMode.TASK_COMMIT) -> None:
+        """For a clock channel, set the sample rate _R (Hz) for device _DEV at channel _CH.
+        Sets the implicit timing _T (=sample number per channel) and task mode _M as well."""
+        if not isinstance(_ch, str): return
+        
+        self.task.co_channels.add_co_pulse_chan_freq(
+            self.__format_channel(_dev, _ch),
+            _r)
+        
+        self.task.timing.cfg_implicit_timing(samps_per_chan=_t)
+        self.task.control(_m)
 
-    
+
+    def set_trigger(self, _dev, _ch) -> None:
+        self.trigger = '/{}'.format(self.__format_channel(_dev, _ch))
+
+
+    def config_sample_clk(self, _r, _trig, _edge, _s) -> None:
+        """Configure the the trigger and clock for IO-channels of task self.task.
+        With the sample rate _R, a trigger _TRIGG, the trigger edge _EDGE and a 
+        number of samples _S."""
+        self.task.timing.cfg_samp_clk_timing(_r, source=_trig, active_edge=_edge, samps_per_chan=_s)
+
+
     def analog_read_n(self, _s) -> np.array:
         """Read _S numbers of samples from the configured input channels and return
         them in an array."""
@@ -113,12 +132,8 @@ class NIUSB6259:
         print('Read will take {}ms'.format(_s / self.rate * 1000))
         tmp = self.task.read(number_of_samples_per_channel=_s)
         return np.array(tmp)
-    
+
+
     def analog_wirte(self, _arr) -> None:
         print('writing {}'.format(_arr))
-        self.task.write(_arr, auto_start=True)
-
-       
-
-    
-
+        self.task.write(_arr)
