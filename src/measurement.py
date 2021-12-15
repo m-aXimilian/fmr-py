@@ -15,27 +15,7 @@ import src.visa_devices as devs
 
 
 class FMRHandler:
-    """
-    {
-        'rf-freq': 2,
-        'rf-p': 0,
-        'rf-rm': rm,    # vi resource manager
-        'rf-conf': './config/hp83508.yaml',
-        'H-set': np.linspace(0,100)/100,
-        'N': 10000,
-        'rate': 1000,
-        'name': 'test',
-        'daq-dev': 'Dev1',
-        'ai': ['ai0', 'ai1'],
-        'ao': ['ao0'],
-        'impuls': 'ctr0',
-        'trigger': 'Ctr0InternalOutput',
-        'mode': TaskMode.TASK_COMMIT,
-        'read-edge': Edge.FALLING,
-        'write-edge': Edge.RISING,
-        'read-timeout': 30,
-    } 
-    """
+    """Measurement Handler. Holds objects of FMRMeasurement"""
     def __init__(self) -> None:
         self.measurements = []
     
