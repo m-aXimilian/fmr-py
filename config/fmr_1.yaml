@@ -1,0 +1,2 @@
+samples: 20000  # number of samples 
+rate: 1000      # sample rate == frequency
