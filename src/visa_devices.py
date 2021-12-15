@@ -18,7 +18,7 @@ class HP83508:
                 tmp = yaml.safe_load(f)
                 self.boundaries = tmp['boundaries']
                 logging.info('RF-Generator boundaries set to {}'.format(self.boundaries))
-                self.id = tmp['id']
+                self.id = _rm.open_resource(tmp['id'])
                 logging.info('RF-Generator with ID {} generated'.format(self.id))
             except yaml.YAMLError as e:
                 logging.debug('in HP83508 __init__ code: {}'.format(e))
