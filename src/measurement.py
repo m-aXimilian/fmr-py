@@ -4,6 +4,7 @@ import yaml
 import pyvisa as vi
 from time import sleep, strftime
 import numpy as np
+from nidaqmx import stream_readers
 
 import os, sys
 
@@ -15,7 +16,28 @@ import src.visa_devices as devs
 
 
 class FMRHandler:
-    """Measurement Handler. Holds objects of FMRMeasurement"""
+    """
+    {
+        'rf-freq': 2,
+        'rf-p': 0,
+        'rf-rm': rm,    # vi resource manager
+        'rf-conf': './config/hp83508.yaml',
+        'H-set': np.linspace(0,100)/100,
+        'N': 10000,
+        'rate': 1000,
+        'name': 'test',
+        'daq-dev': 'Dev1',
+        'ai': ['ai0', 'ai1'],
+        'ao': ['ao0'],
+        'impuls': 'ctr0',
+        'trigger': 'Ctr0InternalOutput',
+        'mode': TaskMode.TASK_COMMIT,
+        'read-edge': Edge.FALLING,
+        'write-edge': Edge.RISING,
+        'read-timeout': 30,
+        'buffer-size': 200
+    } 
+    """
     def __init__(self) -> None:
         self.measurements = []
     
@@ -84,6 +106,11 @@ class FMRMeasurement:
             self.daq_tasks['clock'].trigger, 
             self.params['read-edge'],
             self.params['N']
+        )
+
+        self.in_channels = len(self.daq_tasks['reader'].task.channels)
+        self.in_stream = stream_readers.AnalogMultiChannelReader(
+            self.daq_tasks['reader'].task.in_stream
         )
 
 

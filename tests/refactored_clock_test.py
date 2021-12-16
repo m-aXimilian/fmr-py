@@ -25,7 +25,7 @@ def main():
     config = load_config('./config/init.yaml')
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
-    rate, N = 1000, 100000
+    rate, N = 1000, 1000
     bufsize = 200
     interval = rate/bufsize
 
@@ -80,6 +80,7 @@ def main():
 
         
     print('measurement will take {}s\n'.format(meas_time))
+    print(len(read.task.channels))
     sleep(meas_time)
     
 

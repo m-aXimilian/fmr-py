@@ -31,6 +31,7 @@ class FMRMeasureTest(unittest.TestCase):
         'read-edge': Edge.FALLING,
         'write-edge': Edge.RISING,
         'read-timeout': 30,
+        'buffer-size': 200
     }
     meas = m.FMRMeasurement(par)
     #@unittest.skip()
@@ -51,6 +52,11 @@ class FMRMeasureTest(unittest.TestCase):
         # won't pass if DAQ-card is not connected!
         self.meas.setup_daq_clk()
         self.assertIsNone(self.meas.setup_daq_inputs())
+    
+    def test_channel_number(self):
+        self.meas.setup_daq_clk()
+        self.meas.setup_daq_inputs()
+        self.assertEqual(self.meas.in_channels, 1)
 
     def test_setup_daq_outputs(self):
         # won't pass if DAQ-card is not connected!
