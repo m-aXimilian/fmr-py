@@ -39,6 +39,8 @@ def main():
 
     setH = np.linspace(0,100,N)/100
 
+    write.analog_write(setH)
+
     read.start()
     write.start()
     clock.start()
