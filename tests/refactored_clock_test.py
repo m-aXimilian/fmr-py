@@ -1,11 +1,14 @@
 import os, sys
 import logging
 from nidaqmx.constants import Edge, TaskMode
+from nidaqmx import stream_readers, constants
 import numpy as np
 import pyvisa as vi
 import yaml
 import nidaqmx as daq
 from time import sleep, strftime
+
+from zmq import constants
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -35,16 +38,30 @@ def main():
 
     read.add_channels(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ai']['field-set-measure'], _type='ai')
-    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N)
+    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N, sample_mode=constants.CONTINUOUS)
 
     setH = np.linspace(0,100,N)/100
 
     write.analog_write(setH)
 
+    samples_per_buffer = N/10
+    num_channels = 1
+
+    in_stream = stream_readers.AnalogMultiChannelReader(read.in_stream)
+
+    def read_callback(task_idx, event_type, num_samples, callback_data=None):
+        buff=np.zeros((num_channels, num_samples), dtype=np.float32)
+        in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
+        data =  buff.T.astype(np.float32)
+        print(data)
+    
+    read.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
+
     read.start()
     write.start()
     clock.start()
 
+    """
     out = read.analog_read_n(N, timeout)
 
     np.savetxt('./measurement/test_{}.csv'
@@ -53,7 +70,7 @@ def main():
         header='H-Field from {hmin} to {hmax} at {hf} and sampled \
         with {hs}'.format(hmin=setH[0], hmax=setH[-1], hf=10, hs=100)
     )
-
+    """
 def load_config(file_path):
     with open(file_path,"r") as f:
         try:
