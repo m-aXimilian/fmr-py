@@ -41,6 +41,8 @@ def main():
                 config['devices']['daq-card']['ai']['field-set-measure'], _type='ai')
     read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N, constants.AcquisitionType.CONTINUOUS)
 
+    read.task.in_stream.input_buf_size = samples_per_buffer * 10
+
     in_stream = stream_readers.AnalogSingleChannelReader(read.task.in_stream)
     out_stream = stream_writers.AnalogSingleChannelWriter(read.task.out_stream)
 
@@ -51,13 +53,15 @@ def main():
     
     def read_callback(task_handle, event_type, num_samples, callback_data=None):
         buff=np.zeros(num_samples, dtype=np.float32)
-        in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
+        #in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
+        read.task.in_stream.readinto(buff)
         data =  buff.T.astype(np.float32)
         print('in callback')
+        return 0
     
+    read.task.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
 
     read.start()
-    read.task.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
     write.start()
     clock.start()
 
