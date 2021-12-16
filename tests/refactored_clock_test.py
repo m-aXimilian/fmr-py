@@ -21,6 +21,7 @@ def main():
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
     rate, N, timeout = 1000, 20000, 30
+    samples_per_buffer = int(N/100)
     
     clock.config_clk(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ctr']['impuls-1'],
@@ -37,8 +38,6 @@ def main():
     read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N)
 
     setH = np.linspace(0,100,N)/100
-
-    write.analog_wirte(setH)
 
     read.start()
     write.start()

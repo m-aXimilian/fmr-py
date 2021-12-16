@@ -1,4 +1,5 @@
 from re import L
+from nidaqmx import constants
 from nidaqmx.constants import TaskMode
 from nidaqmx.task import Task
 import pyvisa as vi
