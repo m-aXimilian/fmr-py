@@ -7,6 +7,7 @@ import pyvisa as vi
 import yaml
 import nidaqmx as daq
 from time import sleep, strftime
+import matplotlib.pyplot as plt
 
 
 
@@ -23,13 +24,14 @@ def main():
     config = load_config('./config/init.yaml')
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
-    rate, N, timeout = 1000, 20000, 30
-    samples_per_buffer = int(N/100)
+    rate, N = 1000, 10000
+    bufsize = 1000
+
+    meas_time = N/rate
     
-    
-    clock.config_clk(config['devices']['daq-card']['id'],
-                config['devices']['daq-card']['ctr']['impuls-1'],
-                rate, N, TaskMode.TASK_COMMIT)
+    clock.config_clk(_dev=config['devices']['daq-card']['id'],
+                _ch=config['devices']['daq-card']['ctr']['impuls-1'],
+                _r=rate, _t=N, _m=TaskMode.TASK_COMMIT)
     clock.set_trigger(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['trigger']['impuls-1'])
 
@@ -39,9 +41,9 @@ def main():
 
     read.add_channels(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ai']['field-set-measure'], _type='ai')
-    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N, constants.AcquisitionType.CONTINUOUS)
+    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N)
 
-    read.task.in_stream.input_buf_size = samples_per_buffer * 10
+    #read.task.in_stream.input_buf_size = samples_per_buffer * 10
 
     in_stream = stream_readers.AnalogSingleChannelReader(read.task.in_stream)
     out_stream = stream_writers.AnalogSingleChannelWriter(read.task.out_stream)
@@ -50,22 +52,32 @@ def main():
 
     write.analog_write(setH)
 
+    results = {'samples': []}
     
     def read_callback(task_handle, event_type, num_samples, callback_data=None):
-        buff=np.zeros(num_samples, dtype=np.float32)
+        #buff=np.zeros(num_samples*10, dtype=np.float32)
         #in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
-        read.task.in_stream.readinto(buff)
-        data =  buff.T.astype(np.float32)
-        print(data)
+        #read.task.in_stream.readinto(buff)
+        #data =  buff.T.astype(np.float32)
+        #results['samples'].extend(data)
+
+        data = read.task.read(num_samples)
+        results['samples'].extend(data)
+        print('{}\n{}\n'.format(len(results['samples']), len(data)))
         return 0
     
-    read.task.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
+    read.task.register_every_n_samples_acquired_into_buffer_event(bufsize, read_callback)
 
     read.start()
     write.start()
     clock.start()
 
-    input('keep it busy\n')
+    print('measurement will take {}s\n'.format(meas_time))
+    sleep(meas_time)
+
+    plt.plot(results['samples'])
+    plt.show()
+    
 
     """
     out = read.analog_read_n(N, timeout)
