@@ -1,4 +1,5 @@
 from re import L
+from nidaqmx import constants
 from nidaqmx.constants import TaskMode
 from nidaqmx.task import Task
 import pyvisa as vi
@@ -116,12 +117,12 @@ class NIUSB6259:
         self.trigger = '/{}'.format(self.__format_channel(_dev, _ch))
 
 
-    def config_sample_clk(self, _r, _trig, _edge, _s, *kwargs) -> None:
+    def config_sample_clk(self, _r, _trig, _edge, _s, _m=constants.AcquisitionType.FINITE) -> None:
         """Configure the the trigger and clock for IO-channels of task self.task.
         With the sample rate _R, a trigger _TRIGG, the trigger edge _EDGE and a 
         number of samples _S."""
         self.rate = _r
-        self.task.timing.cfg_samp_clk_timing(_r, source=_trig, active_edge=_edge, samps_per_chan=_s, *kwargs)
+        self.task.timing.cfg_samp_clk_timing(_r, source=_trig, active_edge=_edge, samps_per_chan=_s, sample_mode=_m)
 
 
     def analog_read_n(self, _s, _t) -> np.array:

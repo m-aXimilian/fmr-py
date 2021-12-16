@@ -1,14 +1,14 @@
 import os, sys
 import logging
 from nidaqmx.constants import Edge, TaskMode
-from nidaqmx import stream_readers, constants
+from nidaqmx import stream_readers, stream_writers, constants
 import numpy as np
 import pyvisa as vi
 import yaml
 import nidaqmx as daq
 from time import sleep, strftime
 
-from zmq import constants
+
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -24,6 +24,7 @@ def main():
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
     rate, N, timeout = 1000, 20000, 30
+    samples_per_buffer = int(N/100)
     
     clock.config_clk(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ctr']['impuls-1'],
@@ -37,26 +38,25 @@ def main():
 
     read.add_channels(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ai']['field-set-measure'], _type='ai')
-    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N, sample_mode=constants.CONTINUOUS)
+    read.config_sample_clk(rate, clock.trigger, Edge.FALLING, N, constants.AcquisitionType.CONTINUOUS)
+
+    in_stream = stream_readers.AnalogSingleChannelReader(read.task.in_stream)
+    out_stream = stream_writers.AnalogSingleChannelWriter(read.task.out_stream)
 
     setH = np.linspace(0,100,N)/100
 
-    write.analog_wirte(setH)
+    write.analog_write(setH)
 
-    samples_per_buffer = N/10
-    num_channels = 1
-
-    in_stream = stream_readers.AnalogMultiChannelReader(read.in_stream)
-
-    def read_callback(task_idx, event_type, num_samples, callback_data=None):
-        buff=np.zeros((num_channels, num_samples), dtype=np.float32)
+    
+    def read_callback(task_handle, event_type, num_samples, callback_data=None):
+        buff=np.zeros(num_samples, dtype=np.float32)
         in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
         data =  buff.T.astype(np.float32)
-        print(data)
+        print('in callback')
     
-    read.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
 
     read.start()
+    read.task.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
     write.start()
     clock.start()
 
