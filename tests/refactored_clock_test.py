@@ -9,7 +9,7 @@ import nidaqmx as daq
 from time import sleep, strftime
 import matplotlib.pyplot as plt
 import matplotlib.animation as anima
-
+import threading
 
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -25,8 +25,9 @@ def main():
     config = load_config('./config/init.yaml')
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
-    rate, N = 1000, 10000
+    rate, N = 1000, 100000
     bufsize = 200
+    interval = rate/bufsize
 
     fname = './measurement/{n}-{f}GHz_{t}.csv'.format(
                 n='cont_t',
@@ -64,7 +65,7 @@ def main():
     def read_callback(task_handle, event_type, num_samples, callback_data=None):
         buf=np.zeros((5,num_samples))
         in_stream.read_many_sample(buf,num_samples)
-        write_out(fname,buf.T)
+        write_out(fname,buf.T, 'one,two,three,four,five')
         #data = read.task.read(num_samples)
         #results['samples'].extend(data)
         #write_out(fname, np.array(data).T)
@@ -77,25 +78,11 @@ def main():
     write.start()
     clock.start()
 
+        
     print('measurement will take {}s\n'.format(meas_time))
     sleep(meas_time)
-
-    #plt.plot(np.array(results['samples']).T)
-    #plt.show()
-    
-    
     
 
-    """
-    out = read.analog_read_n(N, timeout)
-
-    np.savetxt('./measurement/test_{}.csv'
-        .format(strftime("%Y-%m-%d_%H-%M-%S")), 
-        np.array(out), delimiter=',',
-        header='H-Field from {hmin} to {hmax} at {hf} and sampled \
-        with {hs}'.format(hmin=setH[0], hmax=setH[-1], hf=10, hs=100)
-    )
-    """
 def load_config(file_path):
     with open(file_path,"r") as f:
         try:
@@ -103,9 +90,32 @@ def load_config(file_path):
         except yaml.YAMLError as e:
             print(e)
 
-def write_out(_f, _arr):
+def write_out(_f, _arr, _h):
     with open(_f, 'a') as f:
-        np.savetxt(f, _arr, delimiter=',')
+        np.savetxt(f, _arr, delimiter=',',header=_h)
+
+
+def live_plt(_f, _i):
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    
+    while not os.path.exists(_f):
+        sleep(.5)
+
+    def animate(_i, _arr):
+        ax.clear()
+        ax.plot(_arr)
+    
+    with open(_f) as f:
+        data = np.loadtxt(_f, delimiter=',')
+        an = anima.FuncAnimation(fig, animate, fargs=data, interval=_i)
+        plt.show()
+
+    
+
+
+
 
 
 
