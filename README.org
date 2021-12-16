@@ -34,4 +34,7 @@ before stream was read in!
 
 * ToDo
 - [x] config-files for devices
-- [ ] implement Measurement with a clock task
+- [x] implement Measurement with a clock task
+- [x] contiuous Measurement from multiple channels
+- [ ] implement contiuous Measurement in the FMRMeasurement class (add callback and 
+set the stream-reader entry point in the /start_measurement/ member function)

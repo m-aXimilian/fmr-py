@@ -4,6 +4,7 @@ import yaml
 import pyvisa as vi
 from time import sleep, strftime
 import numpy as np
+from nidaqmx import stream_readers
 
 import os, sys
 
@@ -34,6 +35,7 @@ class FMRHandler:
         'read-edge': Edge.FALLING,
         'write-edge': Edge.RISING,
         'read-timeout': 30,
+        'buffer-size': 200
     } 
     """
     def __init__(self) -> None:
@@ -77,6 +79,11 @@ class FMRMeasurement:
             self.daq_tasks['clock'].trigger, 
             self.params['read-edge'],
             self.params['N']
+        )
+
+        self.in_channels = len(self.daq_tasks['reader'].task.channels)
+        self.in_stream = stream_readers.AnalogMultiChannelReader(
+            self.daq_tasks['reader'].task.in_stream
         )
 
 
