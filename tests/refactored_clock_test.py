@@ -56,7 +56,7 @@ def main():
         #in_stream.read_many_sample(buff, num_samples, timeout=constants.WAIT_INFINITELY)
         read.task.in_stream.readinto(buff)
         data =  buff.T.astype(np.float32)
-        print('in callback')
+        print(data)
         return 0
     
     read.task.register_every_n_samples_acquired_into_buffer_event(samples_per_buffer, read_callback)
@@ -64,6 +64,8 @@ def main():
     read.start()
     write.start()
     clock.start()
+
+    input('keep it busy\n')
 
     """
     out = read.analog_read_n(N, timeout)
