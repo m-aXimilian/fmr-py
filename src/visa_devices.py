@@ -138,5 +138,5 @@ class NIUSB6259:
 
 
     def analog_write(self, _arr) -> None:
-        print('writing {}'.format(_arr))
+        
         self.task.write(_arr)
