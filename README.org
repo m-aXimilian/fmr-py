@@ -16,6 +16,7 @@
 - the path to the NIVisa backend can be set in a file called ~.pyvisarc~ (see [[https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html][backend configuration]])
 - see an example for reading and writing with an additional clock task at [[https://github.com/ni/nidaqmx-python/blob/master/nidaqmx/tests/test_read_write.py][nidaqmx tests]]
 
+
 * Documentation
 - [[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
 - [[https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=de-DE][NI-DAQmx man]]
@@ -24,6 +25,11 @@
 * Measurement 
 
 ** DAQmx read and write values
+
+** Continuous Read 
+In order to allow for contiuous input streams, the main thread has to be kept busy
+(i.e. by ~input()~ or ~sleep()~). If that is not done, the read task is terminated
+before stream was read in!
 
 
 * ToDo
