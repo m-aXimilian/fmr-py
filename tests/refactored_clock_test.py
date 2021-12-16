@@ -21,7 +21,7 @@ def main():
     logging.basicConfig(filename='./log/test.log', filemode='w', level=logging.DEBUG)
 
     rate, N, timeout = 1000, 20000, 30
-    samples_per_buffer = int(N/100)
+    
     
     clock.config_clk(config['devices']['daq-card']['id'],
                 config['devices']['daq-card']['ctr']['impuls-1'],
