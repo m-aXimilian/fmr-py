@@ -1,8 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-res = np.loadtxt('./measurement/cont_t-0GHz_2021-12-16_17-49-58.csv', skiprows=0, delimiter=',')
+fname = './measurement/fmr-test-2GHz_2021-12-17_14-14-50.csv'
+
+
+#res = np.loadtxt('./measurement/cont_t-0GHz_2021-12-17_11-13-08.csv', skiprows=0, delimiter=',')
+res= np.genfromtxt(fname, delimiter=',',skip_header=3, names=True)
 print(res.shape)
 
-plt.plot(res)
+print(res.dtype.names)
+
+plt.plot(res['ai1'])
 plt.show()

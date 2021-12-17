@@ -8,6 +8,7 @@
 - NI-DAQmx Pyhton API (~python -m pip install git+https://github.com/ni/nidaqmx-python.git~)[^fn-1]
 - NIVisa
 - pyyaml (~pip install pyyaml~)
+- tqdm for progressbar (~pip install tqdm~)
 
 [^fn-1]: ~Sequence~ moved from ~collections~ to ~collections.abc~ in Python 3.10 which yiedls include errors when using pip [[https://github.com/ni/nidaqmx-python/issues/129][nidaqmx issue 129]]
 
