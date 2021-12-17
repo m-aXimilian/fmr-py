@@ -3,6 +3,7 @@ import numpy as np
 import yaml
 import pyvisa as vi
 from time import sleep, strftime
+from tqdm import tqdm
 import numpy as np
 from nidaqmx import stream_readers
 
@@ -58,6 +59,15 @@ class FMRMeasurement:
             f=self.params['rf-freq'],
             t=strftime("%Y-%m-%d_%H-%M-%S"))
         self.daq_tasks = {}
+        self.cols = ",".join(self.params['ai'])
+
+            
+    def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
+        buf=np.zeros((self.in_channels,self.params['buffer-size']))
+        self.in_stream.read_many_sample(buf,num_samples)
+        self.write_results(buf.T)
+        return 0
+
 
     def setup_rf(self) -> None:
         self.rf = devs.HP83508(self.params['rf-rm'], self.params['rf-conf'])
@@ -86,6 +96,8 @@ class FMRMeasurement:
             self.daq_tasks['reader'].task.in_stream
         )
 
+        self.daq_tasks['reader'].task.register_every_n_samples_acquired_into_buffer_event(
+            self.params['buffer-size'], self.__read_callback)
 
 
     def setup_daq_outputs(self) -> None:
@@ -133,28 +145,43 @@ class FMRMeasurement:
         self.daq_tasks['reader'].start()
         self.daq_tasks['writer'].start()
         self.daq_tasks['clock'].start()
+        
+        m_time = self.params['N']/self.params['rate']
+        
+        logging.info('Meas:  Measurement will take {} seconds.'.format(m_time))
+        
+        for i in tqdm(range(int(m_time))):
+            sleep(1)
 
-        out = self.daq_tasks['reader'].analog_read_n(
-            self.params['N'],
-            self.params['read-timeout']
-        )
+   
+    def cfg_measurement(self) -> None:
+        self.setup_daq_clk()
+        self.setup_daq_inputs()
+        self.setup_daq_outputs()
 
-        self.write_results(out)
 
     def write_results(self, _arr):
 
         meta = 'H-field ramp:\t{hlow} to {hup}\n \
                 f:\t{f}\n \
-                samples:\t{n}'.format(
+                samples:\t{n}\n{cols}'.format(
                     hlow=min(self.params['H-set']),
-                    hup=min(self.params['H-set']),
+                    hup=max(self.params['H-set']),
                     f=self.params['rf-freq'],
-                    n=self.params['N']
+                    n=self.params['N'],
+                    cols=self.cols
                 )
+        ex = os.path.isfile(self.f_name)
         
-        np.savetxt(self.f_name, 
-            np.array(_arr), delimiter=',',
-            header=meta)
+        with open(self.f_name,'a') as f:
+            if ex:
+                np.savetxt(f, 
+                np.array(_arr), delimiter=',')
+            else:
+                logging.info("File {} created.".format(self.f_name))
+                np.savetxt(f, 
+                    np.array(_arr), delimiter=',',
+                    header=meta)
         
 
 
