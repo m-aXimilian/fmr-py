@@ -100,6 +100,7 @@ class FMRMeasurement:
         buf=np.zeros((self.in_channels,self.params['buffer-size']))
         self.in_stream.read_many_sample(buf,num_samples)
         self.write_results(buf.T)
+        
         return 0
 
 
@@ -194,6 +195,7 @@ class FMRMeasurement:
         for i in tqdm(range(int(m_time))):
             sleep(1)
 
+        
    
     def cfg_measurement(self) -> None:
         """Configure the measurement in the appropriate order."""
@@ -227,5 +229,10 @@ class FMRMeasurement:
                     np.array(_arr), delimiter=',',
                     header=meta)
         
+
+class WaveForm():
+    def __init__(self) -> None:
+        pass
+    pass
 
 

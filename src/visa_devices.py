@@ -8,6 +8,7 @@ import logging
 import nidaqmx as daq
 import yaml
 
+
 class HP83508:
     """Wrapper for HP83508 RF-source functions"""
     def __init__(self, _rm, _path) -> None:
@@ -52,6 +53,7 @@ class NIUSB6259:
 
     def __del__(self) -> None:
         self.task.close()
+
     
     def start(self) -> None:
         self.task.start()
@@ -138,5 +140,8 @@ class NIUSB6259:
 
 
     def analog_write(self, _arr) -> None:
-        
+        """Write _ARR to the specified output channel."""
         self.task.write(_arr)
+
+
+
