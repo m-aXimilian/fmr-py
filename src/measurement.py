@@ -54,6 +54,9 @@ class FMRHandler:
 class FMRMeasurement:
     """
     Container for a single measuremnt process (channels, frequency etc. can NOT be reconfigured).
+
+    ATTENTION: Works with a arbitrary number of Input Channels, but only one Output Channel
+    at a time!
     """
     def __init__(self, _params) -> None:
         """
@@ -84,7 +87,11 @@ class FMRMeasurement:
             f=self.params['rf-freq'],
             t=strftime("%Y-%m-%d_%H-%M-%S"))
         self.daq_tasks = {}
-        self.cols = ",".join(self.params['ai'])
+
+        if isinstance(self.params['ai'], str):
+            self.cols = self.params['ai']
+        else:
+            self.cols = ",".join(self.params['ai'])
 
             
     def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
@@ -187,6 +194,8 @@ class FMRMeasurement:
 
    
     def cfg_measurement(self) -> None:
+        """Configure the measurement in the appropriate order."""
+        # self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
         self.setup_daq_clk()
         self.setup_daq_inputs()
         self.setup_daq_outputs()
