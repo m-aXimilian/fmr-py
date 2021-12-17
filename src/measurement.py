@@ -90,6 +90,8 @@ class FMRMeasurement:
 
         if isinstance(self.params['ai'], str):
             self.cols = self.params['ai']
+        elif issubclass(type(self.params['ai']), dict):
+            self.cols = ",".join(self.params['ai'].keys())
         else:
             self.cols = ",".join(self.params['ai'])
 
