@@ -24,11 +24,17 @@ import src.visa_devices as devs
 
 class FMRHandler:
     """Generate FMR measurements from a single yaml-file. Automatically generates subdirectories
-    depending on the measurement metadata."""
+    depending on the measurement metadata.
+
+    A measurement configuration must be passed (See template_recipe.yaml)
+        as well as a task mode, a read-edge and a write-edge for properly synchronizing the
+        DAQ-data.
+        
+        Args: 
+            _path (str):    complete path to the configuration file (can be relative).
+            _edges (dict):  mode, read-edge and write-edge for DAQ-sync
+    """
     def __init__(self, _path, _edges) -> None:
-        """A measurement configuration must be passed in _PATH (See template_recipe.yaml).
-        In _EDGES, a task mode, a read-edge and a write-edge must be passed for properly synchronizing the
-        DAQ-data."""
         self.params = FMRHandler.read_setup(_path)
         self.params.update(_edges)
         rm = vi.ResourceManager()
