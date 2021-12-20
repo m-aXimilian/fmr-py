@@ -1,11 +1,13 @@
 import logging
 import numpy as np
+from numpy.core.fromnumeric import shape
 import yaml
 import pyvisa as vi
 from time import sleep, strftime
 from tqdm import tqdm
 import numpy as np
 from nidaqmx import stream_readers
+from scipy import signal
 
 import os, sys
 
@@ -82,11 +84,10 @@ class FMRMeasurement:
             } 
         """
         self.params = _params
-        self.f_name = './measurement/{n}-{f}GHz_{t}.csv'.format(
-            n=self.params['name'],
-            f=self.params['rf-freq'],
-            t=strftime("%Y-%m-%d_%H-%M-%S"))
+        self.f_name = self.generate_filename()
         self.daq_tasks = {}
+        self.waves = WaveForm(self.params['h-max'],self.params['N'])
+        self.params['H-set'] = self.waves.triangle_10()
 
         if isinstance(self.params['ai'], str):
             self.cols = self.params['ai']
@@ -103,6 +104,11 @@ class FMRMeasurement:
         
         return 0
 
+    def generate_filename(self) -> str:
+        return  './measurement/{n}-{f}GHz_{t}.csv'.format(
+            n=self.params['name'],
+            f=self.params['rf-freq'],
+            t=strftime("%Y-%m-%d_%H-%M-%S"))
 
     def setup_rf(self) -> None:
         """Sets up the RF-source with the paramters from self.PARAMS (dict)"""
@@ -231,8 +237,30 @@ class FMRMeasurement:
         
 
 class WaveForm():
-    def __init__(self) -> None:
-        pass
-    pass
+    def __init__(self, _hmax, _n) -> None:
+        self.hmax = _hmax
+        self.N = _n
+    
+
+    def triangle(self):
+        """Returns a triangular (single-peak) wave of form /\\
+            peak:   self.hmax/100
+            len:    self.N"""
+        return (signal.sawtooth(
+            2*np.pi*np.linspace(0, 1, self.N),
+            0.5
+            ) + 1) / 2 * self.hmax/100
+        
+    
+    def triangle_10(self):
+        """Returns a triangular (single-peak) wave of form with 10% 0 field _/\\_
+            peak:   self.hmax/100
+            len:    self.N"""
+        no_field = int(.1*self.N)
+        ramp = self.N - 2 * no_field
+        saw = (signal.sawtooth(2*np.pi*np.linspace(0, 1, ramp), 0.5) + 1) / 2 * self.hmax/100
+        no_field_vec = np.zeros(shape=(no_field,))
+        tmp = np.append(no_field_vec, saw)
+        return np.append(tmp, no_field_vec)
 
 

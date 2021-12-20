@@ -8,9 +8,9 @@ import yaml
 import nidaqmx as daq
 import time
 from nidaqmx.constants import Edge, TaskMode
+import threading
 
-
-def main():
+def measure():
     config = load_config('./config/init.yaml')
     logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
     logging.info('Started in main()')
@@ -22,12 +22,12 @@ def main():
         'rf-p': 0,
         'rf-rm': rm,    # vi resource manager
         'rf-conf': './config/hp83508.yaml',
-        'H-set': np.linspace(0,100,2000)/100,
+        'h-max': 150,
         'N': 2000,
         'rate': 1000,
         'name': 'fmr-test',
         'daq-dev': 'Dev1',
-        'ai': {'set-field-m':'ai1', 'garbage':'ai0'},
+        'ai': {'field-set-measure':'ai1', 'field-is-measure': 'ai2', 'x-value-lockin':'ai0', 'y-value-lockin': 'ai4', },
         'ao': ['ao0'],
         'impuls': 'ctr0',
         'trigger': 'Ctr0InternalOutput',
@@ -42,6 +42,11 @@ def main():
     meas.cfg_measurement()
     meas.start_measurement()
     
+
+
+def main():
+    tr = threading.Thread(target=measure)
+    tr.start()
     
     
 def load_config(file_path):
