@@ -26,16 +26,22 @@
 * Measurement 
 
 ** DAQmx read and write values
+Each channel type must be provided with its own task. Syncronization is handled via a dedicated task exploiting the device's internal clock (and trigger).
 
 ** Continuous Read 
-In order to allow for contiuous input streams, the main thread has to be kept busy
+In order to allow for contiuous input streams, the handler thread has to be kept busy
 (i.e. by ~input()~ or ~sleep()~). If that is not done, the read task is terminated
 before stream was read in!
+
+** Continuous Plot
+Because the matplotlib is *not threadsafe* it cannot be attached to a thread different than the main thread. To allow contiuous plotting anyway, the measurement and data writing is attached to a different thread. 
 
 
 * ToDo
 - [x] config-files for devices
-- [x] implement Measurement with a clock task
+- [x] implement measurement with a clock task
 - [ ] write the FMRHandler for FMRMeasurement class
-- [x] contiuous Measurement from multiple channels
-- [x] implement contiuous Measurement in the FMRMeasurement class (add callback and set the stream-reader entry point in the /start_measurement/ member function)
+- [x] contiuous measurement from multiple channels
+- [x] implement contiuous measurement in the FMRMeasurement class (add callback and set the stream-reader entry point in the /start_measurement/ member function)
+- [x] write a waveform generator
+- [x] contiuously plot measurement data
