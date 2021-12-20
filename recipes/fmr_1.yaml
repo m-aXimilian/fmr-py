@@ -1,7 +1,7 @@
 rf-start: 2
-rf-stop: 5
+rf-stop: 2
 rf-step: .5
-rf-freq: 5
+rf-freq: 2
 rf-p: 0
 rf-conf: './config/hp83508.yaml'
 h-max: 150
