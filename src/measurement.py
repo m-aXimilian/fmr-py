@@ -10,6 +10,8 @@ import numpy as np
 from nidaqmx import stream_readers
 from scipy import signal
 from pathlib import Path
+import threading
+import matplotlib.pyplot as plt
 
 import os, sys
 
@@ -21,38 +23,94 @@ import src.visa_devices as devs
 
 
 class FMRHandler:
-    """
-    {
-        'rf-freq': 2,
-        'rf-p': 0,
-        'rf-rm': rm,    # vi resource manager
-        'rf-conf': './config/hp83508.yaml',
-        'H-set': np.linspace(0,100)/100,
-        'N': 10000,
-        'rate': 1000,
-        'name': 'test',
-        'daq-dev': 'Dev1',
-        'ai': ['ai0', 'ai1'],
-        'ao': ['ao0'],
-        'impuls': 'ctr0',
-        'trigger': 'Ctr0InternalOutput',
-        'mode': TaskMode.TASK_COMMIT,
-        'read-edge': Edge.FALLING,
-        'write-edge': Edge.RISING,
-        'read-timeout': 30,
-        'buffer-size': 200
-    } 
-    """
-    def __init__(self) -> None:
-        self.measurements = []
     
+    def __init__(self, _path, _edges) -> None:
+        self.params = FMRHandler.read_setup(_path)
+        self.params.update(_edges)
+        rm = vi.ResourceManager()
+        self.params['rf-rm'] = rm
+        self.waves = WaveForm(self.params['h-max'], self.params['N'], self.params['h-zero'])
+        self.params['H-set'] = self.waves.triangle_10()
 
-    def single_f_measurement() -> None:
-        pass
+        tmp_dir = self.params['dir']
+        self.do_single_f = (self.params['rf-start'] == self.params['rf-stop'])
+        if not self.do_single_f:
+            self.params['dir']  = '{}/{}/{}'.format(
+                tmp_dir,
+                'measurement',
+                '{}_{}-{}GHz_sweep'.format(
+                    self.params['name'],
+                    self.params['rf-start'],
+                    self.params['rf-stop']
+                )
+            )
+        else:
+            self.params['dir']  = '{}/{}/{}'.format(
+                tmp_dir,
+                'measurement',
+                '{}_{}GHz'.format(
+                    self.params['name'],
+                    self.params['rf-freq'],
+                )
+            )
 
-    
-    def sweep_f_measurement() -> None:
-        pass
+        Path(self.params['dir']).mkdir(parents=True, exist_ok=True)
+
+
+    def measure_thread(_fmr_meas):
+        _fmr_meas.cfg_measurement()
+        _fmr_meas.start_measurement()
+        _fmr_meas.release_resources()    
+
+
+    def start_FMR(self):
+        
+        for i in np.arange(self.params['rf-start'], 
+            self.params['rf-stop'] + self.params['rf-step'], 
+            self.params['rf-step']):
+            self.params['rf-freq'] = i
+            meas = FMRMeasurement(self.params)
+            name, params = meas.f_name, meas.params
+            tr = threading.Thread(target=FMRHandler.measure_thread, args=(meas,))
+            tr.start()
+            
+            
+
+
+    def plotter_subs(self, _fname, _params):
+        to_plot = os.path.isfile(_fname)
+        while not to_plot:
+            sleep(.2)
+            to_plot = os.path.isfile(_fname)
+        
+        reps = int(_params['N']/_params['buffer-size'])
+        plt_pause = _params['buffer-size']/_params['rate']
+
+        fig, (field, lock) = plt.subplots(2, 1)
+        
+        for i in range(reps):
+            field.cla()
+            lock.cla()
+            r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
+            row_names = r.dtype.names
+            field.plot(r[row_names[0]],'g--', label=row_names[0])
+            field.plot(r[row_names[1]],'r', label=row_names[1])
+            lock.plot(r[row_names[2]], label=row_names[2])
+            lock.plot(r[row_names[3]], label=row_names[3])
+            field.legend(loc='upper left')
+            field.grid()
+            lock.legend(loc='upper left')
+            lock.grid()
+            plt.pause(plt_pause)
+        plt.show(block=False)
+        plt.pause(2)
+        plt.close()
+
+        
+    @staticmethod
+    def read_setup(_path) -> dict:
+        with open(_path) as f:
+            return yaml.safe_load(f)
 
 
 class FMRMeasurement:
@@ -65,18 +123,19 @@ class FMRMeasurement:
     def __init__(self, _params) -> None:
         """
         _PARAMS dictionary must contain the following
-            {
+        {
             'rf-freq': 2,
             'rf-p': 0,
             'rf-rm': rm,    # vi resource manager
             'rf-conf': './config/hp83508.yaml',
-            'H-set': np.linspace(0,100)/100,
-            'N': 10000,
+            'h-max': 150,
+            'h-zero': 0.1,   # p.u. for zero field start and end
+            'N': 1000,
             'rate': 1000,
-            'name': 'test',
-            'dir': './measurement/',
+            'name': 'fmr-test',
+            'dir': './measurement/', # must be terminated with a "/"
             'daq-dev': 'Dev1',
-            'ai': ['ai0', 'ai1'],
+            'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
             'ao': ['ao0'],
             'impuls': 'ctr0',
             'trigger': 'Ctr0InternalOutput',
@@ -84,16 +143,20 @@ class FMRMeasurement:
             'read-edge': Edge.FALLING,
             'write-edge': Edge.RISING,
             'read-timeout': 30,
-            } 
+            'buffer-size': 200
+        }
         """
         self.params = _params
 
-        Path(self.params['dir']).mkdir(parents=True, exist_ok=True)
+        # move to handler
+       # Path(self.params['dir'] + self.params['name']).mkdir(parents=True, exist_ok=True)
         
         self.f_name = self.generate_filename()
         self.daq_tasks = {}
-        self.waves = WaveForm(self.params['h-max'],self.params['N'])
-        self.params['H-set'] = self.waves.triangle_10()
+
+        # move to handler
+        #self.waves = WaveForm(self.params['h-max'], self.params['N'], self.params['h-zero'])
+        #self.params['H-set'] = self.waves.triangle_10()
 
         if isinstance(self.params['ai'], str):
             self.cols = self.params['ai']
@@ -119,7 +182,7 @@ class FMRMeasurement:
         return 0
 
     def generate_filename(self) -> str:
-        return  '{d}{n}-{f}GHz_{t}.csv'.format(
+        return  '{d}/{n}-{f}GHz_{t}.csv'.format(
             d=self.params['dir'],
             n=self.params['name'],
             f=self.params['rf-freq'],
@@ -209,11 +272,11 @@ class FMRMeasurement:
         self.daq_tasks['writer'].start()
         self.daq_tasks['clock'].start()
         
-        m_time = self.params['N']/self.params['rate']
+        self.m_time = self.params['N']/self.params['rate']
         
-        logging.info('Meas:  Measurement will take {} seconds.'.format(m_time))
+        logging.info('Meas:  Measurement will take {} seconds.'.format(self.m_time))
         
-        for i in tqdm(range(int(m_time))):
+        for i in tqdm(range(int(self.m_time))):
             sleep(1)
         
         # for task in self.daq_tasks.values():
@@ -255,9 +318,10 @@ class FMRMeasurement:
         
 
 class WaveForm():
-    def __init__(self, _hmax, _n) -> None:
+    def __init__(self, _hmax, _n, _hzero = 0) -> None:
         self.hmax = _hmax
         self.N = _n
+        self.h_zero = _hzero
     
 
     def triangle(self):
@@ -274,11 +338,10 @@ class WaveForm():
         """Returns a triangular (single-peak) wave of form with 10% 0 field _/\\_
             peak:   self.hmax/100
             len:    self.N"""
-        no_field = int(.1*self.N)
+        no_field = int(self.h_zero*self.N)
         ramp = self.N - 2 * no_field
         saw = (signal.sawtooth(2*np.pi*np.linspace(0, 1, ramp), 0.5) + 1) / 2 * self.hmax/100
         no_field_vec = np.zeros(shape=(no_field,))
-        tmp = np.append(no_field_vec, saw)
-        return np.append(tmp, no_field_vec)
+        return np.append(np.append(no_field_vec, saw), no_field_vec)
 
 

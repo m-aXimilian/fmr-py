@@ -73,28 +73,15 @@ def main():
     logging.info('Started in main()')
     
     rm = vi.ResourceManager()
+    wave = m.WaveForm(200, 1000, 0.1)
+    saw2 = wave.triangle_10()
     
-    param = {
-        'rf-freq': 2,
-        'rf-p': 0,
-        'rf-rm': rm,    # vi resource manager
-        'rf-conf': './config/hp83508.yaml',
-        'h-max': 150,
-        'N': 1000,
-        'rate': 1000,
-        'name': 'fmr-test',
-        'dir': './measurement/', # must be terminated with a "/"
-        'daq-dev': 'Dev1',
-        'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
-        'ao': ['ao0'],
-        'impuls': 'ctr0',
-        'trigger': 'Ctr0InternalOutput',
-        'mode': TaskMode.TASK_COMMIT,
-        'read-edge': Edge.FALLING,
-        'write-edge': Edge.RISING,
-        'read-timeout': 30,
-        'buffer-size': 200
-    }
+    param = load_config('./recipes/fmr_1.yaml')
+    param.update({'mode': TaskMode.TASK_COMMIT,
+            'read-edge': Edge.FALLING,
+            'write-edge': Edge.RISING,
+            'H-set': saw2,
+            'dir': './testmeasure'})
     meas = m.FMRMeasurement(param)
     name, params = meas.f_name, meas.params
     tr = threading.Thread(target=measure, args=(meas,))
@@ -102,44 +89,7 @@ def main():
         
     plotter_subs(name, params)
     
-    # tr.join()
-    # del meas
-    # del rm
-
-    logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
-    logging.info('Started in main()')
-
     
-    rm = vi.ResourceManager()
-    
-    param = {
-        'rf-freq': 3,
-        'rf-p': 0,
-        'rf-rm': rm,    # vi resource manager
-        'rf-conf': './config/hp83508.yaml',
-        'h-max': 150,
-        'N': 1000,
-        'rate': 1000,
-        'name': 'fmr-test',
-        'dir': './measurement/', # must be terminated with a "/"
-        'daq-dev': 'Dev1',
-        'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
-        'ao': ['ao0'],
-        'impuls': 'ctr0',
-        'trigger': 'Ctr0InternalOutput',
-        'mode': TaskMode.TASK_COMMIT,
-        'read-edge': Edge.FALLING,
-        'write-edge': Edge.RISING,
-        'read-timeout': 30,
-        'buffer-size': 200
-    }
-    meas = m.FMRMeasurement(param)
-    name, params = meas.f_name, meas.params
-    sleep(3)
-    tr = threading.Thread(target=measure, args=(meas,))
-    tr.start()
-        
-    plotter_subs(name, params)
     
 def load_config(file_path):
     with open(file_path,"r") as f:
