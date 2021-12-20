@@ -65,7 +65,8 @@ class FMRHandler:
 
 
     def start_FMR(self):
-        
+        """For every frequency defined in the parameters one measurement will be taken.
+        If the start and the stop frequency are identical, there will be only one file."""
         for i in np.arange(self.params['rf-start'], 
             self.params['rf-stop'] + self.params['rf-step'], 
             self.params['rf-step']):
@@ -74,13 +75,13 @@ class FMRHandler:
             name, params = meas.f_name, meas.params
             tr = threading.Thread(target=FMRHandler.measure_thread, args=(meas,))
             tr.start()
-            sleep(2)
+            
+            self.live_plot_subs(name, params)
             
             
-            
-
-
-    def plotter_subs(self, _fname, _params):
+    def live_plot_subs(self, _fname, _params):
+        """Live Plot from the date in _FNAME and corresponding parameters in _PARAMS.
+        ATTENTION: Crappy! Only works with 4 or more columns in the _FNAME data file."""
         to_plot = os.path.isfile(_fname)
         while not to_plot:
             sleep(.2)
@@ -90,6 +91,10 @@ class FMRHandler:
         plt_pause = _params['buffer-size']/_params['rate']
 
         fig, (field, lock) = plt.subplots(2, 1)
+        fig.canvas.set_window_title('{} {}GHz'.format(
+            _params['name'],
+            _params['rf-freq']
+        ))
         
         for i in range(reps):
             field.cla()
@@ -112,6 +117,7 @@ class FMRHandler:
         
     @staticmethod
     def read_setup(_path) -> dict:
+        """Return a dictionary from the yaml-file in _PATH."""
         with open(_path) as f:
             return yaml.safe_load(f)
 
@@ -282,18 +288,13 @@ class FMRMeasurement:
         for i in tqdm(range(int(self.m_time))):
             sleep(1)
         
-        # for task in self.daq_tasks.values():
-        #     task.task.close()
-
-        
    
     def cfg_measurement(self) -> None:
         """Configure the measurement in the appropriate order."""
-        # self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
+        self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
         self.setup_daq_clk()
         self.setup_daq_inputs()
         self.setup_daq_outputs()
-
 
 
     def write_results(self, _arr):

@@ -1,12 +1,12 @@
 rf-start: 2
-rf-stop: 2
+rf-stop: 5
 rf-step: .5
 rf-freq: 2
 rf-p: 0
 rf-conf: './config/hp83508.yaml'
 h-max: 150
 h-zero: 0.1   # p.u. for zero field start and end
-N: 1000
+N: 10000
 rate: 1000
 name: 'fmr-test'
 dir: '.' # must be terminated with a "/"
