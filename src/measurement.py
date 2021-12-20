@@ -1,3 +1,4 @@
+from genericpath import exists
 import logging
 import numpy as np
 from numpy.core.fromnumeric import shape
@@ -8,6 +9,7 @@ from tqdm import tqdm
 import numpy as np
 from nidaqmx import stream_readers
 from scipy import signal
+from pathlib import Path
 
 import os, sys
 
@@ -72,6 +74,7 @@ class FMRMeasurement:
             'N': 10000,
             'rate': 1000,
             'name': 'test',
+            'dir': './measurement/',
             'daq-dev': 'Dev1',
             'ai': ['ai0', 'ai1'],
             'ao': ['ao0'],
@@ -84,6 +87,9 @@ class FMRMeasurement:
             } 
         """
         self.params = _params
+
+        Path(self.params['dir']).mkdir(parents=True, exist_ok=True)
+        
         self.f_name = self.generate_filename()
         self.daq_tasks = {}
         self.waves = WaveForm(self.params['h-max'],self.params['N'])
@@ -96,7 +102,7 @@ class FMRMeasurement:
         else:
             self.cols = ",".join(self.params['ai'])
 
-        
+
     def release_resources(self):
         logging.info('Reached destructor')
         for task in self.daq_tasks.values():
@@ -113,7 +119,8 @@ class FMRMeasurement:
         return 0
 
     def generate_filename(self) -> str:
-        return  './measurement/{n}-{f}GHz_{t}.csv'.format(
+        return  '{d}{n}-{f}GHz_{t}.csv'.format(
+            d=self.params['dir'],
             n=self.params['name'],
             f=self.params['rf-freq'],
             t=strftime("%Y-%m-%d_%H-%M-%S"))

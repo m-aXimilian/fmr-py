@@ -63,7 +63,9 @@ def plotter_subs(_fname, _params):
         lock.legend(loc='upper left')
         lock.grid()
         plt.pause(plt_pause)
-    plt.show()
+    plt.show(block=False)
+    plt.pause(2)
+    plt.close()
 
 def main():
     config = load_config('./config/init.yaml')
@@ -78,10 +80,10 @@ def main():
         'rf-rm': rm,    # vi resource manager
         'rf-conf': './config/hp83508.yaml',
         'h-max': 150,
-        'N': 10000,
+        'N': 1000,
         'rate': 1000,
         'name': 'fmr-test',
-        'dir': './measurement/',
+        'dir': './measurement/', # must be terminated with a "/"
         'daq-dev': 'Dev1',
         'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
         'ao': ['ao0'],
@@ -116,9 +118,10 @@ def main():
         'rf-rm': rm,    # vi resource manager
         'rf-conf': './config/hp83508.yaml',
         'h-max': 150,
-        'N': 10000,
+        'N': 1000,
         'rate': 1000,
         'name': 'fmr-test',
+        'dir': './measurement/', # must be terminated with a "/"
         'daq-dev': 'Dev1',
         'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
         'ao': ['ao0'],
@@ -132,6 +135,7 @@ def main():
     }
     meas = m.FMRMeasurement(param)
     name, params = meas.f_name, meas.params
+    sleep(3)
     tr = threading.Thread(target=measure, args=(meas,))
     tr.start()
         
