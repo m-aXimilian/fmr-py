@@ -57,6 +57,7 @@ class FMRHandler:
         Path(self.params['dir']).mkdir(parents=True, exist_ok=True)
 
 
+    @staticmethod
     def measure_thread(_fmr_meas):
         _fmr_meas.cfg_measurement()
         _fmr_meas.start_measurement()
@@ -73,6 +74,8 @@ class FMRHandler:
             name, params = meas.f_name, meas.params
             tr = threading.Thread(target=FMRHandler.measure_thread, args=(meas,))
             tr.start()
+            sleep(2)
+            
             
             
 
@@ -167,7 +170,7 @@ class FMRMeasurement:
 
 
     def release_resources(self):
-        logging.info('Reached destructor')
+        logging.info('Releasing daq resource')
         for task in self.daq_tasks.values():
             if task.task._handle is None:
                 return

@@ -15,21 +15,13 @@ import src.visa_devices as devs
 import src.measurement as m
 
 def main():
-    # wave = m.WaveForm(200, 10000, 0.1)
-    # saw = wave.triangle()
-    # saw2 = wave.triangle_10()
-    # print(shape(saw))
-    # print(shape(saw2))
-    # plt.plot(saw)
-    # plt.plot(saw2)
-    # plt.show()
+    
     logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
 
     edges = {'mode': TaskMode.TASK_COMMIT,
             'read-edge': Edge.FALLING,
             'write-edge': Edge.RISING,}
     fmr = m.FMRHandler('./recipes/fmr_1.yaml', edges)
-    # print(fmr.params['H-set'])
     fmr.start_FMR()
     
 
