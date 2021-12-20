@@ -50,10 +50,6 @@ class NIUSB6259:
     def __init__(self) -> None:
         self.task = daq.Task()
 
-
-    def __del__(self) -> None:
-        self.task.close()
-
     
     def start(self) -> None:
         self.task.start()

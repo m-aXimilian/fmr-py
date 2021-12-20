@@ -14,6 +14,7 @@ import threading
 def measure(_meas):
     _meas.cfg_measurement()
     _meas.start_measurement()
+    _meas.release_resources()
     
 def plotter(_fname, _params):
     to_plot = os.path.isfile(_fname)
@@ -77,7 +78,45 @@ def main():
         'rf-rm': rm,    # vi resource manager
         'rf-conf': './config/hp83508.yaml',
         'h-max': 150,
-        'N': 50000,
+        'N': 10000,
+        'rate': 1000,
+        'name': 'fmr-test',
+        'dir': './measurement/',
+        'daq-dev': 'Dev1',
+        'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
+        'ao': ['ao0'],
+        'impuls': 'ctr0',
+        'trigger': 'Ctr0InternalOutput',
+        'mode': TaskMode.TASK_COMMIT,
+        'read-edge': Edge.FALLING,
+        'write-edge': Edge.RISING,
+        'read-timeout': 30,
+        'buffer-size': 200
+    }
+    meas = m.FMRMeasurement(param)
+    name, params = meas.f_name, meas.params
+    tr = threading.Thread(target=measure, args=(meas,))
+    tr.start()
+        
+    plotter_subs(name, params)
+    
+    # tr.join()
+    # del meas
+    # del rm
+
+    logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
+    logging.info('Started in main()')
+
+    
+    rm = vi.ResourceManager()
+    
+    param = {
+        'rf-freq': 3,
+        'rf-p': 0,
+        'rf-rm': rm,    # vi resource manager
+        'rf-conf': './config/hp83508.yaml',
+        'h-max': 150,
+        'N': 10000,
         'rate': 1000,
         'name': 'fmr-test',
         'daq-dev': 'Dev1',
@@ -95,10 +134,8 @@ def main():
     name, params = meas.f_name, meas.params
     tr = threading.Thread(target=measure, args=(meas,))
     tr.start()
-    
-    
+        
     plotter_subs(name, params)
-    
     
 def load_config(file_path):
     with open(file_path,"r") as f:

@@ -95,11 +95,15 @@ class FMRMeasurement:
             self.cols = ",".join(self.params['ai'].keys())
         else:
             self.cols = ",".join(self.params['ai'])
-        
-    # def __del__(self):
-    #     for daq in self.daq_tasks.values():
-    #         daq.task.close()
 
+        
+    def release_resources(self):
+        logging.info('Reached destructor')
+        for task in self.daq_tasks.values():
+            if task.task._handle is None:
+                return
+            task.task.close()
+            
             
     def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
         buf=np.zeros((self.in_channels,self.params['buffer-size']))
@@ -204,6 +208,9 @@ class FMRMeasurement:
         
         for i in tqdm(range(int(m_time))):
             sleep(1)
+        
+        # for task in self.daq_tasks.values():
+        #     task.task.close()
 
         
    
