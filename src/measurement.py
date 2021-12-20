@@ -95,6 +95,10 @@ class FMRMeasurement:
             self.cols = ",".join(self.params['ai'].keys())
         else:
             self.cols = ",".join(self.params['ai'])
+        
+    # def __del__(self):
+    #     for daq in self.daq_tasks.values():
+    #         daq.task.close()
 
             
     def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
