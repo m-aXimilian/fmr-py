@@ -23,8 +23,12 @@ import src.visa_devices as devs
 
 
 class FMRHandler:
-    
+    """Generate FMR measurements from a single yaml-file. Automatically generates subdirectories
+    depending on the measurement metadata."""
     def __init__(self, _path, _edges) -> None:
+        """A measurement configuration must be passed in _PATH (See template_recipe.yaml).
+        In _EDGES, a task mode, a read-edge and a write-edge must be passed for properly synchronizing the
+        DAQ-data."""
         self.params = FMRHandler.read_setup(_path)
         self.params.update(_edges)
         rm = vi.ResourceManager()
@@ -59,6 +63,8 @@ class FMRHandler:
 
     @staticmethod
     def measure_thread(_fmr_meas):
+        """Target function for thread-based measurement. An object _FMR_MEAS 
+        of type :class:`~FMRMeasurement` must be passed."""
         _fmr_meas.cfg_measurement()
         _fmr_meas.start_measurement()
         _fmr_meas.release_resources()    
@@ -81,6 +87,7 @@ class FMRHandler:
             
     def live_plot_subs(self, _fname, _params):
         """Live Plot from the date in _FNAME and corresponding parameters in _PARAMS.
+
         ATTENTION: Crappy! Only works with 4 or more columns in the _FNAME data file."""
         to_plot = os.path.isfile(_fname)
         while not to_plot:
@@ -176,6 +183,8 @@ class FMRMeasurement:
 
 
     def release_resources(self):
+        """Needed to release the NI DAQ-resource. If not called after a measurement, no new one
+        can be created in the same process due to the occupied resource."""
         logging.info('Releasing daq resource')
         for task in self.daq_tasks.values():
             if task.task._handle is None:
@@ -184,6 +193,9 @@ class FMRMeasurement:
             
             
     def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
+        """Callback function registered with register_every_n_samples_acquired_into_buffer_event.
+        See the nidaqmx documentation for details.
+        """
         buf=np.zeros((self.in_channels,self.params['buffer-size']))
         self.in_stream.read_many_sample(buf,num_samples)
         self.write_results(buf.T)
@@ -191,6 +203,7 @@ class FMRMeasurement:
         return 0
 
     def generate_filename(self) -> str:
+        """Generate a reasonably unique filename to save the measurement data."""
         return  '{d}/{n}-{f}GHz_{t}.csv'.format(
             d=self.params['dir'],
             n=self.params['name'],
@@ -322,7 +335,11 @@ class FMRMeasurement:
         
 
 class WaveForm():
+    """Generate basic waveform vectors form minimal inputs."""
     def __init__(self, _hmax, _n, _hzero = 0) -> None:
+        """_HMAX provides the (abs) maximum H-filed (mT) that is not exceeded. 
+        The output linspace-vector has shape (_N,) and a prior-/post-zero field of
+        _HZERO*_N."""
         self.hmax = _hmax
         self.N = _n
         self.h_zero = _hzero

@@ -1,0 +1,19 @@
+rf-start: 2     # start rf-frequency for F-sweep (GHz)
+rf-stop: 5      # stop rf-frequency F-sweep (GHz)
+rf-step: .5     # F step for frequency sweep (f-start and f-stop INCLUSIVE) (GHz)
+rf-freq: 2      # programmatically changed and passed to the measurement (GHz)
+rf-p: 0         # RF-power (dBm)
+rf-conf: './config/hp83508.yaml'  # location of the config file for the HP83508 RF-Generator
+h-max: 150      # H-field amplitude (mT)
+h-zero: 0.1     # p.u. of N for zero field start and end of the H-field vector (p.u.)
+N: 10000        # number of samples for read AND write
+rate: 1000      # sample rate (1/s)
+name: 'fmr-test'  # sample name
+dir: '.'        # base directory for the measurement data (subdirectories are generated automatically)
+daq-dev: 'Dev1' # name of the NI DAQ device
+ai: {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', } # channels to read
+ao: ['ao0']     # channels to wirte
+impuls: 'ctr0'  # clock channel
+trigger: 'Ctr0InternalOutput' # clock trigger name
+read-timeout: 30  # timeout for data-saving (not necessary, for continuous data-stream)
+buffer-size: 200  # number of samples in a buffer (e.g. each <buffer-size> samples a data write-out is performed)
