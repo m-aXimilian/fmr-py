@@ -33,6 +33,25 @@ In order to allow for contiuous input streams, the handler thread has to be kept
 (i.e. by ~input()~ or ~sleep()~). If that is not done, the read task is terminated
 before stream was read in!
 
+** Sweeping with the FMRHandler
+The main thread has to be kept on hold for at least 2 seconds before iterating. Otherwise, the resource is recognized occupied.
+Currently, this is done implicitly by calling the plotting function, which holds the main thread by means of ~plt.pause()~.
+#+BEGIN_SRC python
+def start_FMR(self):
+        """For every frequency defined in the parameters one measurement will be taken.
+        If the start and the stop frequency are identical, there will be only one file."""
+        for i in np.arange(self.params['rf-start'], 
+            self.params['rf-stop'] + self.params['rf-step'], 
+            self.params['rf-step']):
+            self.params['rf-freq'] = i
+            meas = FMRMeasurement(self.params)
+            name, params = meas.f_name, meas.params
+            tr = threading.Thread(target=FMRHandler.measure_thread, args=(meas,))
+            tr.start()
+            
+            self.live_plot_subs(name, params)
+#+END_SRC
+
 ** Continuous Plot
 Because the matplotlib is *not threadsafe* it cannot be attached to a thread different than the main thread. To allow contiuous plotting anyway, the measurement and data writing is attached to a different thread. 
 
