@@ -4,7 +4,8 @@ pages:
   stage: deploy
   script:
     - pip install -U sphinx mock 
-    - sphinx-build -b html -c docs . public 
+    - cd docs && make html 
+    - cp -r docs/html/ public
   artifacts:
     paths:
     - public
