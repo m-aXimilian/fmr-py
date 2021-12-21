@@ -210,7 +210,7 @@ class FMRMeasurement:
 
         Args:
             task_handle (nidaqmx.Task): the task on which the event ocurred
-            event_type (): EveryNSamplesEventType.ACQUIRED_INTO_BUFFER value
+            event_type (niadqmx.EventType): EveryNSamplesEventType.ACQUIRED_INTO_BUFFER value
             num_samples (int): the N in every_n_samples
             callback_data ([type], optional): Passing None for this parameter unregisters the event callback function. Defaults to None.
 
