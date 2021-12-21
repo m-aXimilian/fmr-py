@@ -1,9 +1,12 @@
+image: python:3.7-alpine
+
 pages:
   stage: deploy
   script:
-    - mv docs/_build/html/ public/
+    - pip install -U sphinx
+    - sphinx-build -b html . public
   artifacts:
     paths:
     - public
-  only:
-    - dev
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
