@@ -6,4 +6,4 @@ pages:
     paths:
     - public
   only:
-    - $CI_DEFAULT_BRANCH
+    - dev
