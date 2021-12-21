@@ -3,7 +3,7 @@ image: python:3.7-alpine
 pages:
   stage: deploy
   script:
-    - pip install -U sphinx
+    - pip install -U sphinx mock 
     - sphinx-build -b html -c docs . public 
   artifacts:
     paths:
