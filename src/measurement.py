@@ -25,9 +25,10 @@ import src.visa_devices as devs
 class FMRHandler:
     """Generate FMR measurements from a single yaml-file. Automatically generates subdirectories
     depending on the measurement metadata.
+    
     A measurement configuration must be passed (See template_recipe.yaml)
     as well as a task mode, a read-edge and a write-edge for properly synchronizing the
-    DAQ-data.
+    DAQ-data. The handler abstracts the task control.
         
     Args: 
         _path (str):    complete path to the configuration file (can be relative).
