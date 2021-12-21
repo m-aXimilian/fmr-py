@@ -12,8 +12,14 @@
 #
 import os
 import sys
+import mock
+
 sys.path.insert(0, os.path.abspath('..'))
 
+MOCK_MODULES = ['numpy', 'matplotlib', 'matplotlib.pyplot', 'nidaqmx', 'pyvisa', 'tqdm', 'scipy',
+'numpy.core', 'nidaqmx.constants', 'numpy.core.fromnumeric', 'nidaqmx.task']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
 # -- Project information -----------------------------------------------------
 
