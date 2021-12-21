@@ -94,7 +94,8 @@ class FMRHandler:
     def live_plot_subs(self, _fname, _params):
         """Live Plot from the date in _FNAME and corresponding parameters in _PARAMS.
 
-        ATTENTION: Crappy! Only works with 4 or more columns in the _FNAME data file."""
+        ATTENTION: If less than 4 columns are available in the measurement file, 
+        only the first one will be shown."""
         to_plot = os.path.isfile(_fname)
         while not to_plot:
             sleep(.2)
@@ -102,31 +103,47 @@ class FMRHandler:
         
         reps = int(_params['N']/_params['buffer-size'])
         plt_pause = _params['buffer-size']/_params['rate']
-
-        fig, (field, lock) = plt.subplots(2, 1)
-        fig.canvas.set_window_title('{} {}GHz'.format(
-            _params['name'],
-            _params['rf-freq']
-        ))
+        r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
+        row_names = r.dtype.names
         
-        for i in range(reps):
-            field.cla()
-            lock.cla()
-            r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
-            row_names = r.dtype.names
-            field.plot(r[row_names[0]],'g--', label=row_names[0])
-            field.plot(r[row_names[1]],'r', label=row_names[1])
-            lock.plot(r[row_names[2]], label=row_names[2])
-            lock.plot(r[row_names[3]], label=row_names[3])
-            field.legend(loc='upper left')
-            field.grid()
-            lock.legend(loc='upper left')
-            lock.grid()
-            plt.pause(plt_pause)
-        plt.show(block=False)
-        plt.pause(2)
-        plt.close()
-
+        if len(row_names) >= 4:
+            fig, (field, lock) = plt.subplots(2, 1)
+            fig.canvas.set_window_title('{} {}GHz'.format(
+                _params['name'],
+                _params['rf-freq']
+            ))
+            
+            for i in range(reps):
+                field.cla()
+                lock.cla()
+                r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
+                row_names = r.dtype.names
+                field.plot(r[row_names[0]],'g--', label=row_names[0])
+                field.plot(r[row_names[1]],'r', label=row_names[1])
+                lock.plot(r[row_names[2]], label=row_names[2])
+                lock.plot(r[row_names[3]], label=row_names[3])
+                field.legend(loc='upper left')
+                field.grid()
+                lock.legend(loc='upper left')
+                lock.grid()
+                plt.pause(plt_pause)
+            plt.show(block=False)
+            plt.pause(2)
+            plt.close()
+        
+        else: 
+            
+            for i in range(reps):
+                plt.cla()
+                r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
+                row_names = r.dtype.names
+                plt.plot(r[row_names[0]],'g--', label=row_names[0])
+                plt.legend(loc='upper left')
+                plt.grid()
+                plt.pause(plt_pause)
+            plt.show(block=False)
+            plt.pause(2)
+            plt.close()
         
     @staticmethod
     def read_setup(_path) -> dict:
@@ -210,7 +227,7 @@ class FMRMeasurement:
 
     def generate_filename(self) -> str:
         """Generate a reasonably unique filename to save the measurement data."""
-        return  '{d}/{n}-{f}GHz_{t}.csv'.format(
+        return  '{d}/{t}_{n}-{f}GHz.csv'.format(
             d=self.params['dir'],
             n=self.params['name'],
             f=self.params['rf-freq'],
@@ -310,7 +327,7 @@ class FMRMeasurement:
    
     def cfg_measurement(self) -> None:
         """Configure the measurement in the appropriate order."""
-        self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
+        #self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
         self.setup_daq_clk()
         self.setup_daq_inputs()
         self.setup_daq_outputs()

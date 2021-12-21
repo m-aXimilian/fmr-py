@@ -59,7 +59,7 @@ Because the matplotlib is *not threadsafe* it cannot be attached to a thread dif
 * ToDo
 - [x] config-files for devices
 - [x] implement measurement with a clock task
-- [ ] write the FMRHandler for FMRMeasurement class
+- [x] write the FMRHandler for FMRMeasurement class
 - [x] contiuous measurement from multiple channels
 - [x] implement contiuous measurement in the FMRMeasurement class (add callback and set the stream-reader entry point in the /start_measurement/ member function)
 - [x] write a waveform generator

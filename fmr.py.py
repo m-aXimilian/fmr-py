@@ -5,7 +5,7 @@ from nidaqmx.constants import Edge, TaskMode
 
 def main():
     
-    logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.INFO)
 
     edges = {'mode': TaskMode.TASK_COMMIT,
             'read-edge': Edge.FALLING,
