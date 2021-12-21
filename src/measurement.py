@@ -25,16 +25,16 @@ import src.visa_devices as devs
 class FMRHandler:
     """Generate FMR measurements from a single yaml-file. Automatically generates subdirectories
     depending on the measurement metadata.
-
     A measurement configuration must be passed (See template_recipe.yaml)
-        as well as a task mode, a read-edge and a write-edge for properly synchronizing the
-        DAQ-data.
+    as well as a task mode, a read-edge and a write-edge for properly synchronizing the
+    DAQ-data.
         
-        Args: 
-            _path (str):    complete path to the configuration file (can be relative).
-            _edges (dict):  mode, read-edge and write-edge for DAQ-sync
+    Args: 
+        _path (str):    complete path to the configuration file (can be relative).
+        _edges (dict):  mode, read-edge and write-edge for DAQ-sync
     """
     def __init__(self, _path, _edges) -> None:
+
         self.params = FMRHandler.read_setup(_path)
         self.params.update(_edges)
         rm = vi.ResourceManager()
@@ -69,8 +69,11 @@ class FMRHandler:
 
     @staticmethod
     def measure_thread(_fmr_meas):
-        """Target function for thread-based measurement. An object _FMR_MEAS 
-        of type :class:`~FMRMeasurement` must be passed."""
+        """Target function for thread-based measurement.
+
+        Args:
+            _fmr_meas (:class:`~FMRMeasurement`): class for measurement handling
+        """
         _fmr_meas.cfg_measurement()
         _fmr_meas.start_measurement()
         _fmr_meas.release_resources()    
@@ -78,7 +81,8 @@ class FMRHandler:
 
     def start_FMR(self):
         """For every frequency defined in the parameters one measurement will be taken.
-        If the start and the stop frequency are identical, there will be only one file."""
+        If the start and the stop frequency are identical, there will be only one file.
+        """
         for i in np.arange(self.params['rf-start'], 
             self.params['rf-stop'] + self.params['rf-step'], 
             self.params['rf-step']):
@@ -92,10 +96,16 @@ class FMRHandler:
             
             
     def live_plot_subs(self, _fname, _params):
-        """Live Plot from the date in _FNAME and corresponding parameters in _PARAMS.
+        """Live Plot the generated measurement data
+        
+        Args:
+            _fname (str): file containing the measurement data
+            _params (dict): complete measurement data
 
-        ATTENTION: If less than 4 columns are available in the measurement file, 
-        only the first one will be shown."""
+        Attention: 
+            If less than 4 columns are available in the measurement file, 
+            only the first one will be shown.
+        """
         to_plot = os.path.isfile(_fname)
         while not to_plot:
             sleep(.2)
@@ -147,55 +157,32 @@ class FMRHandler:
         
     @staticmethod
     def read_setup(_path) -> dict:
-        """Return a dictionary from the yaml-file in _PATH."""
+        """Return a dictionary from a configuration file.
+
+        Args:
+            _path (str): path to the yaml-config file
+
+        Returns:
+            dict: parsed dictionary from the input file
+        """
         with open(_path) as f:
             return yaml.safe_load(f)
 
 
 class FMRMeasurement:
-    """
-    Container for a single measuremnt process (channels, frequency etc. can NOT be reconfigured).
+    """Container for a single measuremnt process (channels, frequency etc. can NOT be reconfigured).
 
-    ATTENTION: Works with a arbitrary number of Input Channels, but only one Output Channel
-    at a time!
-    """
+        Args:
+            _params (dict): see the template_recipe.yaml for a detailed description of the required items
+
+        Attention: 
+            Works with a arbitrary number of Input Channels, but only one Output Channel at a time!
+        """
     def __init__(self, _params) -> None:
-        """
-        _PARAMS dictionary must contain the following
-        {
-            'rf-freq': 2,
-            'rf-p': 0,
-            'rf-rm': rm,    # vi resource manager
-            'rf-conf': './config/hp83508.yaml',
-            'h-max': 150,
-            'h-zero': 0.1,   # p.u. for zero field start and end
-            'N': 1000,
-            'rate': 1000,
-            'name': 'fmr-test',
-            'dir': './measurement/', # must be terminated with a "/"
-            'daq-dev': 'Dev1',
-            'ai': {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', },
-            'ao': ['ao0'],
-            'impuls': 'ctr0',
-            'trigger': 'Ctr0InternalOutput',
-            'mode': TaskMode.TASK_COMMIT,
-            'read-edge': Edge.FALLING,
-            'write-edge': Edge.RISING,
-            'read-timeout': 30,
-            'buffer-size': 200
-        }
-        """
         self.params = _params
 
-        # move to handler
-       # Path(self.params['dir'] + self.params['name']).mkdir(parents=True, exist_ok=True)
-        
         self.f_name = self.generate_filename()
         self.daq_tasks = {}
-
-        # move to handler
-        #self.waves = WaveForm(self.params['h-max'], self.params['N'], self.params['h-zero'])
-        #self.params['H-set'] = self.waves.triangle_10()
 
         if isinstance(self.params['ai'], str):
             self.cols = self.params['ai']
@@ -206,8 +193,9 @@ class FMRMeasurement:
 
 
     def release_resources(self):
-        """Needed to release the NI DAQ-resource. If not called after a measurement, no new one
-        can be created in the same process due to the occupied resource."""
+        """Needed for releasing the NI DAQ-resource. If not called after a measurement, no new one
+        can be created in the same process due to the occupied resource.
+        """
         logging.info('Releasing daq resource')
         for task in self.daq_tasks.values():
             if task.task._handle is None:
@@ -217,7 +205,16 @@ class FMRMeasurement:
             
     def __read_callback(self, task_handle, event_type, num_samples, callback_data=None):
         """Callback function registered with register_every_n_samples_acquired_into_buffer_event.
-        See the nidaqmx documentation for details.
+        See the nidaqmx documentation for details. (the following is taken from there)
+
+        Args:
+            task_handle (nidaqmx.Task): the task on which the event ocurred
+            event_type (): EveryNSamplesEventType.ACQUIRED_INTO_BUFFER value
+            num_samples (int): the N in every_n_samples
+            callback_data ([type], optional): Passing None for this parameter unregisters the event callback function. Defaults to None.
+
+        Returns:
+            int: dummy return
         """
         buf=np.zeros((self.in_channels,self.params['buffer-size']))
         self.in_stream.read_many_sample(buf,num_samples)
@@ -226,7 +223,11 @@ class FMRMeasurement:
         return 0
 
     def generate_filename(self) -> str:
-        """Generate a reasonably unique filename to save the measurement data."""
+        """Generate a reasonably unique filename to save the measurement data.
+
+        Returns:
+            str: filename with time-stamp, sample name and measurement frequency
+        """
         return  '{d}/{t}_{n}-{f}GHz.csv'.format(
             d=self.params['dir'],
             n=self.params['name'],
@@ -234,14 +235,16 @@ class FMRMeasurement:
             t=strftime("%Y-%m-%d_%H-%M-%S"))
 
     def setup_rf(self) -> None:
-        """Sets up the RF-source with the paramters from self.PARAMS (dict)"""
+        """Sets up the RF-source with the paramters from self.PARAMS (dict).
+        """
         self.rf = devs.HP83508(self.params['rf-rm'], self.params['rf-conf'])
         self.rf.setF(self.params['rf-freq'])
         self.rf.setP(self.params['rf-p'])
         
 
     def setup_daq_inputs(self) -> None:
-        """Sets up the DAQ input with the paramters from self.PARAMS (dict)"""
+        """Sets up the DAQ input with the paramters from self.PARAMS (dict)
+        """
         self.daq_tasks.update(
             {'reader' : devs.NIUSB6259()}
         )
@@ -266,7 +269,8 @@ class FMRMeasurement:
             self.params['buffer-size'], self.__read_callback)
 
     def setup_daq_outputs(self) -> None:
-        """Sets up the DAQ output with the paramters from self.PARAMS (dict)"""
+        """Sets up the DAQ output with the paramters from self.PARAMS (dict)
+        """
         self.daq_tasks.update(
             {'writer' : devs.NIUSB6259()}
         )
@@ -284,7 +288,8 @@ class FMRMeasurement:
 
 
     def setup_daq_clk(self) -> None:
-        """Sets up the DAQ clock and trigger with the paramters from self.PARAMS (dict)"""
+        """Sets up the DAQ clock and trigger with the paramters from self.PARAMS (dict)
+        """
         self.daq_tasks.update(
             {'clock' : devs.NIUSB6259()}
         )
@@ -305,7 +310,12 @@ class FMRMeasurement:
     def start_measurement(self) -> None:
         """Start a measurement. Depends on :func:`~self.setup_daq_inputs`
         :func:`~self.setup_daq_outputs` and :func:`~self.setup_daq_clk`.
-        I.e. will raise an error if those were not called before."""
+        I.e. will raise an error if those were not called before.
+
+        Raises:
+            ValueError: If the amplitude of the H-field vector exceeds the 
+                limits defined in the daq_limits.yaml file.
+        """
         with open('./config/daq_limits.yaml', 'r') as f:
             limits = yaml.safe_load(f)
             if max(abs(self.params['H-set'])) > limits['max-v-output']:
@@ -326,7 +336,8 @@ class FMRMeasurement:
         
    
     def cfg_measurement(self) -> None:
-        """Configure the measurement in the appropriate order."""
+        """Configure the measurement in the appropriate order.
+        """
         #self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
         self.setup_daq_clk()
         self.setup_daq_inputs()
@@ -334,7 +345,12 @@ class FMRMeasurement:
 
 
     def write_results(self, _arr):
-        """Writes the array _ARR to the file path provided in """
+        """Appends the array to the output file. The filename is configured in the
+        constructor and is derived from the measurement config-file.
+
+        Args:
+            _arr (np.array): array of data
+        """
         meta = 'H-field ramp:\t{hlow} to {hup}\n \
                 f:\t{f}\n \
                 samples:\t{n}\n{cols}'.format(
@@ -358,20 +374,25 @@ class FMRMeasurement:
         
 
 class WaveForm():
-    """Generate basic waveform vectors form minimal inputs."""
+    """Generate basic waveform H-field vectors form minimal inputs.
+
+        Args:
+            _hmax (int): H-field amplitude maximum (mT)
+            _n (int): length of the array (_n,)
+            _hzero (int, optional): pre- and post zero-field periode. Defaults to 0.
+        """
     def __init__(self, _hmax, _n, _hzero = 0) -> None:
-        """_HMAX provides the (abs) maximum H-filed (mT) that is not exceeded. 
-        The output linspace-vector has shape (_N,) and a prior-/post-zero field of
-        _HZERO*_N."""
         self.hmax = _hmax
         self.N = _n
         self.h_zero = _hzero
     
 
     def triangle(self):
-        """Returns a triangular (single-peak) wave of form /\\
-            peak:   self.hmax/100
-            len:    self.N"""
+        """Returns a triangular (single-peak) wave.
+
+        Returns:
+            [np.linspace]: field-vector
+        """
         return (signal.sawtooth(
             2*np.pi*np.linspace(0, 1, self.N),
             0.5
@@ -379,9 +400,11 @@ class WaveForm():
         
     
     def triangle_10(self):
-        """Returns a triangular (single-peak) wave of form with 10% 0 field _/\\_
-            peak:   self.hmax/100
-            len:    self.N"""
+        """Returns a triangular (single-peak) wave with pre and post zero field.
+
+        Returns:
+            [np.linspace]: field-vector
+        """
         no_field = int(self.h_zero*self.N)
         ramp = self.N - 2 * no_field
         saw = (signal.sawtooth(2*np.pi*np.linspace(0, 1, ramp), 0.5) + 1) / 2 * self.hmax/100
