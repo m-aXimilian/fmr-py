@@ -1,0 +1,180 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>FMR Python Implementation – Documentation &#8212; FMR Python Implementation 0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src" href="modules.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="src"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">FMR Python Implementation 0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">FMR Python Implementation – Documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="fmr-python-implementation-documentation">
+<h1>FMR Python Implementation – Documentation<a class="headerlink" href="#fmr-python-implementation-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Automated FMR-measurements based on simple yaml-recipe files.
+Code lives <a class="reference external" href="https://github.com/m-aXimilian/fmr-py">here</a></p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Python3.# and pyvisa (<cite>pip install pyvisa</cite>)</p></li>
+<li><p>NI-DAQmx Pyhton API (<cite>python -m pip install git+https://github.com/ni/nidaqmx-python.git</cite>) <a class="footnote-reference brackets" href="#id2" id="id1">1</a></p></li>
+<li><p>NIVisa</p></li>
+<li><p>pyyaml (<cite>pip install pyyaml</cite>)</p></li>
+<li><p>tqdm for progressbar (<cite>pip install tqdm</cite>)</p></li>
+</ul>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><cite>Sequence</cite> moved from <cite>collections</cite> to <cite>collections.abc</cite> in Python 3.10 which yiedls include errors when using pip nidaqmx <a class="reference external" href="https://github.com/ni/nidaqmx-python/issues/129">issue 129</a></p>
+</dd>
+</dl>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Create a yaml-file making up the desired measurement routine (see a <a class="reference external" href="https://github.com/m-aXimilian/fmr-py/blob/dev/recipes/template_recipe.yaml">template</a>).</p></li>
+<li><p>Import the <a class="reference internal" href="measurement.html"><span class="doc">measurement module</span></a> module.</p></li>
+<li><p>Create an object of the FMRHandler class and</p></li>
+<li><p>pass it the path to the yaml-file created in 1. as well as a dictionary providing the task-mode and the read- and write-edge for the DAQ process.</p></li>
+<li><p>Call the start method of the created object.</p></li>
+</ol>
+<p>This should look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">src.measurement</span> <span class="k">as</span> <span class="nn">m</span>
+<span class="kn">from</span> <span class="nn">nidaqmx.constants</span> <span class="k">import</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">TaskMode</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./log/fmr.log&#39;</span><span class="p">,</span> <span class="n">filemode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">TaskMode</span><span class="o">.</span><span class="n">TASK_COMMIT</span><span class="p">,</span>
+            <span class="s1">&#39;read-edge&#39;</span><span class="p">:</span> <span class="n">Edge</span><span class="o">.</span><span class="n">FALLING</span><span class="p">,</span>
+            <span class="s1">&#39;write-edge&#39;</span><span class="p">:</span> <span class="n">Edge</span><span class="o">.</span><span class="n">RISING</span><span class="p">,}</span>
+
+    <span class="n">fmr</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">FMRHandler</span><span class="p">(</span><span class="s1">&#39;./recipes/fmr_1.yaml&#39;</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span>
+
+    <span class="n">fmr</span><span class="o">.</span><span class="n">start_FMR</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="measurement.html">measurement module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visa_devices.html">visa_devices module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices">
+<h1>Indices<a class="headerlink" href="#indices" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FMR Python Implementation – Documentation</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices">Indices</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">src</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="src"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">FMR Python Implementation 0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">FMR Python Implementation – Documentation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Maximilian Küffner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>

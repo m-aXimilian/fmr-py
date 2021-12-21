@@ -1,0 +1,166 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>visa_devices module &#8212; FMR Python Implementation 0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">FMR Python Implementation 0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">visa_devices module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-src.visa_devices">
+<span id="visa-devices-module"></span><h1>visa_devices module<a class="headerlink" href="#module-src.visa_devices" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.visa_devices.HP83508">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.visa_devices.</span></span><span class="sig-name descname"><span class="pre">HP83508</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_rm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.visa_devices.HP83508" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper for HP83508 RF-source functions</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.HP83508.setF">
+<span class="sig-name descname"><span class="pre">setF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_f</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.HP83508.setF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a desired set-frequency _F (GHz) and sends it to the device.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.HP83508.setP">
+<span class="sig-name descname"><span class="pre">setP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_p</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.HP83508.setP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a desired set-power _P (dBm) and sends it to the device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.visa_devices.</span></span><span class="sig-name descname"><span class="pre">NIUSB6259</span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper for the NI USB6259 DAQ card.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.add_channels">
+<span class="sig-name descname"><span class="pre">add_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.add_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>_CH can be of type dict, list or string. Contents are added as
+voltage_channels of type _TYPE to the device _DEV.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.analog_read_n">
+<span class="sig-name descname"><span class="pre">analog_read_n</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_t</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.analog_read_n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read _S numbers of samples from the configured input channels with timeout _T and return
+them in an array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.analog_write">
+<span class="sig-name descname"><span class="pre">analog_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_arr</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.analog_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write _ARR to the specified output channel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.config_clk">
+<span class="sig-name descname"><span class="pre">config_clk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TaskMode.TASK_COMMIT</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.config_clk" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a clock channel, set the sample rate _R (Hz) for device _DEV at channel _CH.
+Sets the implicit timing _T (=sample number per channel) and task mode _M as well.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.config_sample_clk">
+<span class="sig-name descname"><span class="pre">config_sample_clk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_trig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">AcquisitionType.FINITE</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.config_sample_clk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the the trigger and clock for IO-channels of task self.task.
+With the sample rate _R, a trigger _TRIGG, the trigger edge _EDGE and a
+number of samples _S.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.set_trigger">
+<span class="sig-name descname"><span class="pre">set_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ch</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.set_trigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.visa_devices.NIUSB6259.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#src.visa_devices.NIUSB6259.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/visa_devices.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">FMR Python Implementation 0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">visa_devices module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Maximilian Küffner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>
