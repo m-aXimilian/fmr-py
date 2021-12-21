@@ -3,6 +3,7 @@ image: python:3.7-alpine
 pages:
   stage: deploy
   script:
+    - apt-get install build-essential
     - pip install -U sphinx mock 
     - cd docs && make html 
     - cp -r docs/html/ public
