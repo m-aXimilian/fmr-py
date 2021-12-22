@@ -39,11 +39,7 @@ This should look something like this:
     import src.measurement as m
     from nidaqmx.constants import Edge, TaskMode
 
-
     def main():
-        
-        logging.basicConfig(filename='./log/fmr.log', filemode='w', level=logging.DEBUG)
-
         edges = {'mode': TaskMode.TASK_COMMIT,
                 'read-edge': Edge.FALLING,
                 'write-edge': Edge.RISING,}

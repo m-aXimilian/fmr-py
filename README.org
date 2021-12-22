@@ -30,6 +30,8 @@
 ** DAQmx read and write values
 Each channel type must be provided with its own task. Syncronization is handled via a dedicated task exploiting the device's internal clock (and trigger).
 
+The shorted analog input should be read in as well to prevent charging effects on the desired channels.
+
 ** Continuous Read 
 In order to allow for contiuous input streams, the handler thread has to be kept busy
 (i.e. by ~input()~ or ~sleep()~). If that is not done, the read task is terminated

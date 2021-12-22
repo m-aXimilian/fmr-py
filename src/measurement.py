@@ -2,6 +2,7 @@ from genericpath import exists
 import logging
 import numpy as np
 from numpy.core.fromnumeric import shape
+from numpy.lib.index_tricks import s_
 import yaml
 import pyvisa as vi
 from time import sleep, strftime
@@ -107,6 +108,9 @@ class FMRHandler:
         Attention: 
             If less than 4 columns are available in the measurement file, 
             only the first one will be shown.
+            The channel names must be provided like stated in the template config-file.
+            If not, the measurement is performed anyway but wont be plottet!
+
         """
         to_plot = os.path.isfile(_fname)
         while not to_plot:
@@ -119,25 +123,41 @@ class FMRHandler:
         row_names = r.dtype.names
         
         if len(row_names) >= 4:
-            fig, (field, lock) = plt.subplots(2, 1)
+            fig, (field, lock, lf) = plt.subplots(3, 1, figsize=(15,10))
             fig.canvas.set_window_title('{} {}GHz'.format(
                 _params['name'],
                 _params['rf-freq']
             ))
-            
+
             for i in range(reps):
                 field.cla()
                 lock.cla()
+                lf.cla()
                 r = np.genfromtxt(_fname, delimiter=',', names=True, skip_header=3)
                 row_names = r.dtype.names
-                field.plot(r[row_names[0]],'g--', label=row_names[0])
-                field.plot(r[row_names[1]],'r', label=row_names[1])
-                lock.plot(r[row_names[2]], label=row_names[2])
-                lock.plot(r[row_names[3]], label=row_names[3])
-                field.legend(loc='upper left')
-                field.grid()
-                lock.legend(loc='upper left')
-                lock.grid()
+                try:
+                    time_ax = [(lambda n: n/self.params['rate'])(m) for m in np.arange(len(r['fieldsetmeasure']))]
+                    field.plot(time_ax, r['fieldsetmeasure']*100,'g--', label='fieldsetmeasure')
+                    field.plot(time_ax, r['fieldismeasure']*100,'r', label='fieldismeasure')
+                    lock.plot(time_ax, r['xvaluelockin'], label='xvaluelockin')
+                    lock.plot(time_ax, r['yvaluelockin'], label='yvaluelockin')
+                    field.legend(loc='upper left')
+                    field.grid()
+                    field.set_xlabel('time/s')
+                    field.set_ylabel('H/mT')
+                    lock.legend(loc='upper left')
+                    lock.grid()
+                    lock.set_xlabel('time/s')
+                    lock.set_ylabel('output/V')
+                except ValueError as e:
+                    logging.error('plotting failed with {}'.format(e))
+                    pass 
+
+                if 'fieldismeasure' in row_names and 'xvaluelockin' in row_names:
+                    lf.plot(r['fieldismeasure']*100, r['xvaluelockin'], label='x over field')
+                    lf.set_xlabel('H/mT')
+                    lf.grid()
+                
                 plt.pause(plt_pause)
             plt.show(block=False)
             plt.pause(2)
