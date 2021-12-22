@@ -1,15 +1,15 @@
 rf-start: 2
-rf-stop: 5
+rf-stop: 2.5
 rf-step: .5
 rf-freq: 2
 rf-p: 0
 rf-conf: './config/hp83508.yaml'
 h-max: 150
 h-zero: 0.1   # p.u. for zero field start and end
-N: 10000
+N: 1000
 rate: 1000
 name: 'fmr-test'
-dir: '.' # must be terminated with a "/"
+dir: './küffner' # must be terminated with a "/"
 daq-dev: 'Dev1'
 ai: {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', }
 ao: ['ao0']

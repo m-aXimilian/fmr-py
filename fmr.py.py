@@ -12,7 +12,6 @@ def main():
             'write-edge': Edge.RISING,}
     fmr = m.FMRHandler('./recipes/fmr_1.yaml', edges)
     fmr.start_FMR()
-    
 
 
 if __name__ == '__main__':

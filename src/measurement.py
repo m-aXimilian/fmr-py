@@ -44,6 +44,7 @@ class FMRHandler:
         self.params['H-set'] = self.waves.triangle_10()
 
         tmp_dir = self.params['dir']
+    
         self.do_single_f = (self.params['rf-start'] == self.params['rf-stop'])
         if not self.do_single_f:
             self.params['dir']  = '{}/{}/{}'.format(
@@ -64,7 +65,7 @@ class FMRHandler:
                     self.params['rf-freq'],
                 )
             )
-
+        logging.info('Resulting files in {}'.format(os.path.abspath(self.params['dir'])))
         Path(self.params['dir']).mkdir(parents=True, exist_ok=True)
 
 
@@ -166,7 +167,7 @@ class FMRHandler:
         Returns:
             dict: parsed dictionary from the input file
         """
-        with open(_path) as f:
+        with open(_path, encoding='utf8') as f:
             return yaml.safe_load(f)
 
 
@@ -368,7 +369,7 @@ class FMRMeasurement:
                 np.savetxt(f, 
                 np.array(_arr), delimiter=',')
             else:
-                logging.info("File {} created.".format(self.f_name))
+                logging.info("File {} created.".format(f))
                 np.savetxt(f, 
                     np.array(_arr), delimiter=',',
                     header=meta)
