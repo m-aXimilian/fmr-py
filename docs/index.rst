@@ -18,6 +18,11 @@ Prerequisites
 
 .. [1] `Sequence` moved from `collections` to `collections.abc` in Python 3.10 which yiedls include errors when using pip nidaqmx `issue 129 <https://github.com/ni/nidaqmx-python/issues/129>`_
 
+Hardware
+--------
+- `Stanford Research SR830 Lockin Amplifier <https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf>`_
+- `Ni 6259 Data Aquisition <https://www.ni.com/pdf/manuals/375216c.pdf>`_
+- `HP83508 sweep oscillator <http://www.test-italy.com/Specifiche%20strumenti%5CHP%5CHP_83540B%5CHP_83540B.pdf>`_
 
 
 Usage

@@ -22,6 +22,8 @@
 - [[https://pyvisa.readthedocs.io/en/latest/index.html][pyvisa man]]
 - [[https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019Pf1SAE&l=de-DE][NI-DAQmx man]]
 - [[https://github.com/ni/nidaqmx-python][nidaqmx python repo]]
+- [[https://rfmw.em.keysight.com//spdhelpfiles/truevolt/webhelp/US/Content/__I_SCPI/IEEE-488_Common_Commands.htm][IEEE 488.2 Common Commands]]
+- [[https://m-aximilian.pages.gitlab.lrz.de/fmr-py/][code documentation]]
 
 * Measurement 
 
@@ -55,6 +57,11 @@ def start_FMR(self):
 ** Continuous Plot
 Because the matplotlib is *not threadsafe* it cannot be attached to a thread different than the main thread. To allow contiuous plotting anyway, the measurement and data writing is attached to a different thread. 
 
+
+** Hardware
+- [[https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf][Stanford Research SR830 Lockin Amplifier]]
+- [[https://www.ni.com/pdf/manuals/375216c.pdf][Ni 6259 Data Aquisition]]
+- [[http://www.test-italy.com/Specifiche%20strumenti%5CHP%5CHP_83540B%5CHP_83540B.pdf][HP83508 sweep oscillator]]
 
 * ToDo
 - [x] config-files for devices
