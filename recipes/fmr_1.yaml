@@ -1,14 +1,14 @@
-rf-start: 2
-rf-stop: 2.5
+rf-start: 12
+rf-stop: 16
 rf-step: .5
 rf-freq: 2
-rf-p: 0
+rf-p: 10
 rf-conf: './config/hp83508.yaml'
-h-max: 150
+h-max: 300
 h-zero: 0.1   # p.u. for zero field start and end
 N: 10000
-rate: 1000
-name: 'fmr-test'
+rate: 100
+name: 'CoFeB26-ref'
 dir: '.' # must be terminated with a "/"
 daq-dev: 'Dev1'
 ai: {'field-set-measure': 'ai1', 'field-is-measure': 'ai2', 'short': 'ai3', 'x-value-lockin': 'ai0', 'y-value-lockin': 'ai4', }

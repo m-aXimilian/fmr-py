@@ -89,6 +89,7 @@ class FMRHandler:
         for i in np.arange(self.params['rf-start'], 
             self.params['rf-stop'] + self.params['rf-step'], 
             self.params['rf-step']):
+            
             self.params['rf-freq'] = i
             meas = FMRMeasurement(self.params)
             name, params = meas.f_name, meas.params
@@ -360,7 +361,7 @@ class FMRMeasurement:
     def cfg_measurement(self) -> None:
         """Configure the measurement in the appropriate order.
         """
-        #self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
+        self.setup_rf()   # (disabled for testing) uncomment when RF-source is connected and running
         self.setup_daq_clk()
         self.setup_daq_inputs()
         self.setup_daq_outputs()

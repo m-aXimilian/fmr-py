@@ -133,7 +133,7 @@ class NIUSB6259:
         for c in channels:
             tmp_c = self.__format_channel(_dev, c)
             logging.debug('adding channel {}'.format(tmp_c))
-            add_fun(tmp_c)
+            add_fun(tmp_c, min_val=-10.0, max_val=10.0,)
 
 
     def config_clk(self, _dev, _ch, _r, _t=1000, _m=TaskMode.TASK_COMMIT) -> None:
