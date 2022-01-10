@@ -2,6 +2,11 @@
 #+subtitle: with basic device support
 #+author: Maximilian Küffner
 
+Ferromagnetic Resonance (FMR) measurements based on an electromagnet controlled via 
+a /Ni 6259 Data Aquisition/-device, a GPIB-controlled /HP83508/-RF-source
+and a /Stanford Research SR830/ Lockin Amplifier (data aquisition via the NI 6259).
+Find the complete code documentation [[https://m-aximilian.pages.gitlab.lrz.de/fmr-py/][here]].
+
 * Prerequisites
 - Python3.# and pyvisa (~pip install pyvisa~)
 - +NI-DAQmx Python API (~pip install nidaqmx~)+
